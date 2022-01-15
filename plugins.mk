@@ -18,13 +18,6 @@
 # along with lsp-plugins-mb-expander.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Package version
-ARTIFACT_ID                 = LSP_PLUGINS_MB_EXPANDER
-ARTIFACT_NAME               = lsp-plugins-mb-expander
-ARTIFACT_TYPE               = plug
-ARTIFACT_DESC               = LSP Multiband Expander Plugin Series
-ARTIFACT_HEADERS            = lsp-plug.in
-ARTIFACT_VERSION            = 1.0.1-devel
-
-
-
+# Variables that describe dependencies
+PLUGIN_DEPENDENCIES     = LSP_PLUGINS_MB_EXPANDER
+PLUGIN_PACKAGE_NAME     = lsp-plugins
