@@ -514,7 +514,16 @@ namespace lsp
             PORTS_END
         };
 
-        // Multiband expander
+        const meta::bundle_t mb_expander_bundle =
+        {
+            "mb_expander",
+            "Multiband Expander",
+            B_MB_DYNAMICS,
+            "TR_Ox7U_a84",
+            "This plugin performs multiband expansion of input signsl. Flexible sidechain\ncontrol configuration provided. As opposite to most available multiband\nexpanders, this expander provides numerous special functions: 'modern'\noperating mode, 'Sidechain boost', 'Lookahead' option and up to 8 frequency\nbands for processing."
+        };
+
+        // Multiband Expander
         const meta::plugin_t  mb_expander_mono =
         {
             "Multi-band Expander Mono x8",
@@ -533,7 +542,8 @@ namespace lsp
             mb_expander_mono_ports,
             "dynamics/expander/multiband/mono.xml",
             NULL,
-            mono_plugin_port_groups
+            mono_plugin_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  mb_expander_stereo =
@@ -554,7 +564,8 @@ namespace lsp
             mb_expander_stereo_ports,
             "dynamics/expander/multiband/stereo.xml",
             NULL,
-            stereo_plugin_port_groups
+            stereo_plugin_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  mb_expander_lr =
@@ -575,7 +586,8 @@ namespace lsp
             mb_expander_lr_ports,
             "dynamics/expander/multiband/lr.xml",
             NULL,
-            stereo_plugin_port_groups
+            stereo_plugin_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  mb_expander_ms =
@@ -596,7 +608,8 @@ namespace lsp
             mb_expander_ms_ports,
             "dynamics/expander/multiband/ms.xml",
             NULL,
-            stereo_plugin_port_groups
+            stereo_plugin_port_groups,
+            &mb_expander_bundle
         };
 
 
@@ -618,7 +631,8 @@ namespace lsp
             sc_mb_expander_mono_ports,
             "dynamics/expander/multiband/mono.xml",
             NULL,
-            mono_plugin_sidechain_port_groups
+            mono_plugin_sidechain_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  sc_mb_expander_stereo =
@@ -639,7 +653,8 @@ namespace lsp
             sc_mb_expander_stereo_ports,
             "dynamics/expander/multiband/stereo.xml",
             NULL,
-            stereo_plugin_sidechain_port_groups
+            stereo_plugin_sidechain_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  sc_mb_expander_lr =
@@ -660,7 +675,8 @@ namespace lsp
             sc_mb_expander_lr_ports,
             "dynamics/expander/multiband/lr.xml",
             NULL,
-            stereo_plugin_sidechain_port_groups
+            stereo_plugin_sidechain_port_groups,
+            &mb_expander_bundle
         };
 
         const meta::plugin_t  sc_mb_expander_ms =
@@ -681,7 +697,8 @@ namespace lsp
             sc_mb_expander_ms_ports,
             "dynamics/expander/multiband/ms.xml",
             NULL,
-            stereo_plugin_sidechain_port_groups
+            stereo_plugin_sidechain_port_groups,
+            &mb_expander_bundle
         };
     } // namespace meta
 } // namespace lsp
