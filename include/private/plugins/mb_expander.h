@@ -140,6 +140,7 @@ namespace lsp
                     dspu::Bypass        sBypass;            // Bypass
                     dspu::Filter        sEnvBoost[2];       // Envelope boost filter
                     dspu::Delay         sDelay;             // Delay for lookahead compensation purpose
+                    dspu::Equalizer     sDryEq;             // Dry equalizer
 
                     exp_band_t          vBands[meta::mb_expander_metadata::BANDS_MAX];      // Expander bands
                     split_t             vSplit[meta::mb_expander_metadata::BANDS_MAX-1];    // Split bands
