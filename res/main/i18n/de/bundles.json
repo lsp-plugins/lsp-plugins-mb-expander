@@ -1,0 +1,7 @@
+{
+	"mb_expander": {
+		"name": "Multiband Expander",
+		"description": "Dieses Plugin leistet eine Multibandexpansion des Eingangssignals. Eine flexible Sidechain-\nsteuerung ist verfügbar. Im Gegensatz zu anderen Multibandkompressoren, \nstellt dieser Expander auch folgende Funktionen zur Verfügung: \n'moderner' Operationsmodus, 'Sidechain Boost', 'Vorschau'\n-Option und bis zu 8 bearbeitbare Frequenzbänder."
+	}
+}
+
