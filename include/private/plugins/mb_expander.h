@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021 Linux Studio Plugins Project <https://lsp-plug.in/>
- *           (C) 2021 Vladimir Sadovnikov <sadko4u@gmail.com>
+ * Copyright (C) 2023 Linux Studio Plugins Project <https://lsp-plug.in/>
+ *           (C) 2023 Vladimir Sadovnikov <sadko4u@gmail.com>
  *
  * This file is part of lsp-plugins-mb-expander
  * Created on: 3 авг. 2021 г.
@@ -97,6 +97,7 @@ namespace lsp
 
                     plug::IPort        *pExtSc;             // External sidechain
                     plug::IPort        *pScSource;          // Sidechain source
+                    plug::IPort        *pScSpSource;        // Sidechain split source
                     plug::IPort        *pScMode;            // Sidechain mode
                     plug::IPort        *pScLook;            // Sidechain lookahead
                     plug::IPort        *pScReact;           // Sidechain reactivity
@@ -184,6 +185,7 @@ namespace lsp
                 bool                    bSidechain;             // External side chain
                 bool                    bEnvUpdate;             // Envelope filter update
                 bool                    bModern;                // Modern mode
+                bool                    bStereoSplit;           // Stereo split mode
                 size_t                  nEnvBoost;              // Envelope boost
                 channel_t              *vChannels;              // Expander channels
                 float                   fInGain;                // Input gain
@@ -213,9 +215,12 @@ namespace lsp
                 plug::IPort            *pShiftGain;             // Shift gain port
                 plug::IPort            *pZoom;                  // Zoom port
                 plug::IPort            *pEnvBoost;              // Envelope adjust
+                plug::IPort            *pStereoSplit;           // Split left/right independently
 
             protected:
                 static bool compare_bands_for_sort(const exp_band_t *b1, const exp_band_t *b2);
+
+                static dspu::sidechain_source_t     decode_sidechain_source(int source, bool split, size_t channel);
 
             public:
                 explicit mb_expander(const meta::plugin_t *metadata, bool sc, size_t mode);
@@ -234,7 +239,7 @@ namespace lsp
 
                 virtual void        dump(dspu::IStateDumper *v) const;
         };
-    } // namespace plugins
-} // namespace lsp
+    } /* namespace plugins */
+} /* namespace lsp */
 
 #endif /* PRIVATE_PLUGINS_MB_EXPANDER_H_ */
