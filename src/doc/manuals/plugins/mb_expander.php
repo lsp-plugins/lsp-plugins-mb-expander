@@ -69,7 +69,7 @@
 	<li><b>FFT<?= $sm ?> Out</b> - enables FFT curve graph of output signal on the spectrum graph.</li>
 	<li><b>Filters<?= $sm ?></b> - enables drawing tranfer function of each sidechain filter on the spectrum graph.</li>
 	<?php if ($m == 's') { ?>
-	<li><b>Stereo Split</b> - enables independent compression of left and right channels.</li>
+	<li><b>Stereo Split</b> - enables independent processing of left and right channels.</li>
 	<?php } ?>
 	<li><b>Zoom</b> - zoom fader, allows to adjust zoom on the frequency chart.</li>
 </ul>
