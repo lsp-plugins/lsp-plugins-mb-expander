@@ -48,7 +48,7 @@
 	sidechain signal. 
 	</li>
 	<?php if ($m == 's') { ?>
-	<li><b>Stereo split mode</b> allows to apply compression to the left and right channels independently.</li>
+	<li><b>Stereo split mode</b> allows to apply processing to the left and right channels independently.</li>
 	<?php } ?>
 </ul>
 <p><b>Controls:</b></p>
@@ -146,10 +146,10 @@
 			<li><b>Max</b> - the absolute maximum value is taken from stereo input.</li>
 		<?php } ?>
 		<?php if ($m == 's') { ?>
-			<li><b>Left/Right</b> - left and right channels are being compressed using respectively the left and right sidechain channels in stereo split mode.</li>
-			<li><b>Right/Left</b> - left and right channels are being compressed using respectively the right and left sidechain channels in stereo split mode.</li>
-			<li><b>Mid/Side</b> - left and right channels are being compressed using respectively the middle and side parts of sidechain signal in stereo split mode.</li>
-			<li><b>Side/Mid</b> - left and right channels are being compressed using respectively the side and middle parts of sidechain signal in stereo split mode.</li>
+			<li><b>Left/Right</b> - left and right channels are being processed using respectively the left and right sidechain channels in stereo split mode.</li>
+			<li><b>Right/Left</b> - left and right channels are being processed using respectively the right and left sidechain channels in stereo split mode.</li>
+			<li><b>Mid/Side</b> - left and right channels are being processed using respectively the middle and side parts of sidechain signal in stereo split mode.</li>
+			<li><b>Side/Mid</b> - left and right channels are being processed using respectively the side and middle parts of sidechain signal in stereo split mode.</li>
 		<?php } ?>
 	</ul>
 	<li><b>Sidechain Lookahead</b> - look-ahead time of the sidechain relative to the input signal.</li>
