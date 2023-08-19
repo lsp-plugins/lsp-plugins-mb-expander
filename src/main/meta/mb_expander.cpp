@@ -78,25 +78,26 @@ namespace lsp
 
         static const port_item_t mb_exp_sc_boost[] =
         {
-            { "None",       "sidechain.boost.none" },
-            { "Pink BT",    "sidechain.boost.pink_bt" },
-            { "Pink MT",    "sidechain.boost.pink_mt" },
-            { "Brown BT",   "sidechain.boost.brown_bt" },
-            { "Brown MT",   "sidechain.boost.brown_mt" },
+            { "None",           "sidechain.boost.none"      },
+            { "Pink BT",        "sidechain.boost.pink_bt"   },
+            { "Pink MT",        "sidechain.boost.pink_mt"   },
+            { "Brown BT",       "sidechain.boost.brown_bt"  },
+            { "Brown MT",       "sidechain.boost.brown_mt"  },
             { NULL, NULL }
         };
 
         static const port_item_t mb_global_mb_exp_modes[] =
         {
-            { "Classic",    "multiband.classic" },
-            { "Modern",     "multiband.modern" },
+            { "Classic",        "multiband.classic"         },
+            { "Modern",         "multiband.modern"          },
+            { "Linear Phase",   "multiband.linear_phase"    },
             { NULL, NULL }
         };
 
         static const port_item_t mb_exp_modes[] =
         {
-            { "Down",       "mb_expand.down_ward" },
-            { "Up",         "mb_expand.up_ward" },
+            { "Down",       "mb_expand.down_ward"           },
+            { "Up",         "mb_expand.up_ward"             },
             { NULL, NULL }
         };
 

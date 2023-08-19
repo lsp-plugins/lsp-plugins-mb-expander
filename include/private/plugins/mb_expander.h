@@ -31,6 +31,7 @@
 #include <lsp-plug.in/dsp-units/filters/Filter.h>
 #include <lsp-plug.in/dsp-units/util/Analyzer.h>
 #include <lsp-plug.in/dsp-units/util/Delay.h>
+#include <lsp-plug.in/dsp-units/util/FFTCrossover.h>
 #include <lsp-plug.in/dsp-units/util/MeterGraph.h>
 #include <lsp-plug.in/dsp-units/util/Sidechain.h>
 
@@ -63,6 +64,13 @@ namespace lsp
                     S_ALL           = S_COMP_CURVE | S_EQ_CURVE
                 };
 
+                enum xover_mode_t
+                {
+                    XOVER_CLASSIC,                              // Classic mode
+                    XOVER_MODERN,                               // Modern mode
+                    XOVER_LINEAR_PHASE                          // Linear phase mode
+                };
+
                 typedef struct exp_band_t
                 {
                     dspu::Sidechain     sSC;                // Sidechain module
@@ -73,6 +81,7 @@ namespace lsp
                     dspu::Filter        sAllFilter;         // All-pass filter for phase compensation
                     dspu::Delay         sScDelay;           // Delay for lookahead purpose
 
+                    float              *vBuffer;            // Crossover band data
                     float              *vTr;                // Transfer function
                     float              *vVCA;               // Voltage-controlled amplification value for each band
                     float               fScPreamp;          // Sidechain preamp
@@ -141,7 +150,11 @@ namespace lsp
                     dspu::Bypass        sBypass;            // Bypass
                     dspu::Filter        sEnvBoost[2];       // Envelope boost filter
                     dspu::Delay         sDelay;             // Delay for lookahead compensation purpose
+                    dspu::Delay         sDryDelay;          // Delay for dry signal
+                    dspu::Delay         sAnDelay;           // Delay for analyzer
+                    dspu::Delay         sXOverDelay;        // Delay for crossover
                     dspu::Equalizer     sDryEq;             // Dry equalizer
+                    dspu::FFTCrossover  sFFTXOver;          // FFT crossover for linear phase
 
                     exp_band_t          vBands[meta::mb_expander_metadata::BANDS_MAX];      // Expander bands
                     split_t             vSplit[meta::mb_expander_metadata::BANDS_MAX-1];    // Split bands
@@ -184,7 +197,7 @@ namespace lsp
                 size_t                  nMode;                  // Expander channel mode
                 bool                    bSidechain;             // External side chain
                 bool                    bEnvUpdate;             // Envelope filter update
-                bool                    bModern;                // Modern mode
+                xover_mode_t            enXOver;                // Crossover mode
                 bool                    bStereoSplit;           // Stereo split mode
                 size_t                  nEnvBoost;              // Envelope boost
                 channel_t              *vChannels;              // Expander channels
@@ -221,24 +234,27 @@ namespace lsp
                 static bool compare_bands_for_sort(const exp_band_t *b1, const exp_band_t *b2);
 
                 static dspu::sidechain_source_t     decode_sidechain_source(int source, bool split, size_t channel);
+                static size_t                       select_fft_rank(size_t sample_rate);
+                static void                         process_band(void *object, void *subject, size_t band, const float *data, size_t sample, size_t count);
 
             public:
                 explicit mb_expander(const meta::plugin_t *metadata, bool sc, size_t mode);
-                virtual ~mb_expander();
+                virtual ~mb_expander() override;
 
-                virtual void        init(plug::IWrapper *wrapper, plug::IPort **ports);
-                virtual void        destroy();
+                virtual void        init(plug::IWrapper *wrapper, plug::IPort **ports) override;
+                virtual void        destroy() override;
 
             public:
-                virtual void        update_settings();
-                virtual void        update_sample_rate(long sr);
-                virtual void        ui_activated();
+                virtual void        update_settings() override;
+                virtual void        update_sample_rate(long sr) override;
+                virtual void        ui_activated() override;
 
-                virtual void        process(size_t samples);
-                virtual bool        inline_display(plug::ICanvas *cv, size_t width, size_t height);
+                virtual void        process(size_t samples) override;
+                virtual bool        inline_display(plug::ICanvas *cv, size_t width, size_t height) override;
 
-                virtual void        dump(dspu::IStateDumper *v) const;
+                virtual void        dump(dspu::IStateDumper *v) const override;
         };
+
     } /* namespace plugins */
 } /* namespace lsp */
 
