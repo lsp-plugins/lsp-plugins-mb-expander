@@ -60,8 +60,9 @@ namespace lsp
                 {
                     S_COMP_CURVE    = 1 << 0,
                     S_EQ_CURVE      = 1 << 1,
+                    S_BAND_CURVE    = 1 << 2,
 
-                    S_ALL           = S_COMP_CURVE | S_EQ_CURVE
+                    S_ALL           = S_COMP_CURVE | S_EQ_CURVE | S_BAND_CURVE
                 };
 
                 enum xover_mode_t
@@ -82,7 +83,8 @@ namespace lsp
                     dspu::Delay         sScDelay;           // Delay for lookahead purpose
 
                     float              *vBuffer;            // Crossover band data
-                    float              *vTr;                // Transfer function
+                    float              *vSc;                // Transfer function for sidechain
+                    float              *vTr;                // Transfer function for band
                     float              *vVCA;               // Voltage-controlled amplification value for each band
                     float               fScPreamp;          // Sidechain preamp
 
