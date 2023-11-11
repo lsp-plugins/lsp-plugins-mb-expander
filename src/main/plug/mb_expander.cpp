@@ -297,7 +297,7 @@ namespace lsp
                         MBE_BUFFER_SIZE * sizeof(float) + // vBuffer for each channel
                         MBE_BUFFER_SIZE * sizeof(float) + // vScBuffer for each channel
                         ((bSidechain) ? MBE_BUFFER_SIZE * sizeof(float) : 0) + // vExtScBuffer for each channel
-                        MBE_BUFFER_SIZE * sizeof(float) * 2 + // vInAnalyze + vOutAnalyze for each channel
+                        MBE_BUFFER_SIZE * sizeof(float) + // vInAnalyze for each channel
                         // Band buffers
                         (
                             MBE_BUFFER_SIZE * sizeof(float) + // vBuffer of each band
@@ -393,13 +393,11 @@ namespace lsp
                 ptr            += filter_mesh_size;
                 c->vInAnalyze   = reinterpret_cast<float *>(ptr);
                 ptr            += MBE_BUFFER_SIZE * sizeof(float);
-                c->vOutAnalyze  = reinterpret_cast<float *>(ptr);
-                ptr            += MBE_BUFFER_SIZE * sizeof(float);
 
                 c->nAnInChannel = an_cid++;
                 c->nAnOutChannel= an_cid++;
-                vAnalyze[c->nAnInChannel]   = c->vInAnalyze;
-                vAnalyze[c->nAnOutChannel]  = c->vOutAnalyze;
+                vAnalyze[c->nAnInChannel]   = NULL;
+                vAnalyze[c->nAnOutChannel]  = NULL;
 
                 c->bInFft       = false;
                 c->bOutFft      = false;
@@ -1312,6 +1310,7 @@ namespace lsp
                         c->sEnvBoost[1].process(c->vExtScBuffer, c->vExtScBuffer, to_process);
 
                     c->sAnDelay.process(c->vInAnalyze, c->vBuffer, to_process);
+                    vAnalyze[c->nAnInChannel] = c->vInAnalyze;
                 }
 
                 // MAIN PLUGIN STUFF
@@ -1462,7 +1461,7 @@ namespace lsp
                 for (size_t i=0; i<channels; ++i)
                 {
                     channel_t *c        = &vChannels[i];
-                    dsp::copy(c->vOutAnalyze, c->vBuffer, to_process);
+                    vAnalyze[c->nAnOutChannel] = c->vBuffer;
                 }
 
                 sAnalyzer.process(vAnalyze, to_process);
@@ -1927,7 +1926,6 @@ namespace lsp
                     v->write("vTr", c->vTr);
                     v->write("vTrMem", c->vTrMem);
                     v->write("vInAnalyze", c->vInAnalyze);
-                    v->write("vOutAnalyze", c->vOutAnalyze);
 
                     v->write("nAnInChannel", c->nAnInChannel);
                     v->write("nAnOutChannel", c->nAnOutChannel);
