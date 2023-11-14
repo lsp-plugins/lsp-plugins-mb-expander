@@ -70,8 +70,8 @@
 						<mesh id="bfc_${i}" width="2" fill="true" smooth="true" color="graph_mesh_cycle" color.hue=":hue_${i}" fcolor="graph_mesh_cycle" fcolor.hue=":hue_${i}" fcolor.a="0.9" visibility=":flt and :cbe_${i}"/>
 					</ui:for>
 
-					<mesh id="ifg" width="0" color="mono_in" color.a="0.8" fcolor.a="0.8" fill="true" fcolor="mono_in" visibility=":ife"/>
-					<mesh id="ofg" width="3" color="mono" visibility=":ofe"/>
+					<mesh id="ifg" oy=":_ui_zoomable_spectrum_graph ? 1 : 3" width="0" color="mono_in" color.a="0.8" fcolor.a="0.8" fill="true" fcolor="mono_in" visibility=":ife"/>
+					<mesh id="ofg" oy=":_ui_zoomable_spectrum_graph ? 1 : 3" width="3" color="mono" visibility=":ofe"/>
 					<mesh id="ag" width="3" color="left" smooth="true"/>
 
 					<!-- Boundaries -->
@@ -82,6 +82,8 @@
 					<axis min="10" max="24000" angle="0.0" log="true" visibility="false"/>
 					<axis min="-72 db / (:zoom ** 3)" max="24 db * :zoom" color="graph_prim" angle="0.5" log="true"/>
 					<axis min="-1" max="1" visibility="false" angle="0.5"/>
+					<axis min="-72 db" max="24 db" color="graph_prim" angle="0.5" log="true" visibility="false"/>
+
 
 					<!-- Text -->
 					<ui:with ox="0" oy="2" y="0" halign="1" valign="1">
@@ -222,7 +224,7 @@
 		<!-- down part -->
 		<hbox>
 
-			<cgroup id="bsel" embed.h=":bsel ilt 1" embed.b=":bsel ilt 1">
+			<cgroup id="bsel" embed.h=":bsel ilt 1" embed.b=":bsel ilt 1" width.min="855" height.min="350">
 				<grid rows="11" cols="25" transpose="true">
 					<!-- Labels -->
 					<label text="labels.band" pad.v="4" bg.color="bg_schema" hreduce="true"/>
@@ -289,7 +291,7 @@
 							</ui:if>
 
 							<cell cols="2" pad.h="6" bg.color="bg_schema">
-								<grid rows="2" cols="1" hspacing="4">
+								<grid rows="2" cols="1" hspacing="4" vreduce="true">
 									<button
 										id="ee_${i}"
 										text="labels.chan.on"
@@ -497,7 +499,7 @@
 							</align>
 							<hsep vreduce="true"/>
 
-							<grid rows="5" cols="8" hspacing="0" expand="true">
+							<grid rows="7" cols="8" hspacing="0" expand="true">
 								<!-- r1,2 -->
 								<ui:with vreduce="true">
 									<cell rows="2"><label text="labels.mode"/></cell>
@@ -560,6 +562,8 @@
 									<value id="rrl_${i}"/>
 									<value id="rt_${i}"/>
 								</ui:with>
+								<cell cols="8"><hsep bg.color="bg" pad.v="2" vreduce="true"/></cell>
+								<cell cols="8"><void fill="true" expand="true"/></cell>
 
 							</grid>
 						</vbox>
