@@ -26,7 +26,7 @@
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MAJOR       1
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MINOR       0
-#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       15
+#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       16
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION  \
     LSP_MODULE_VERSION( \
@@ -688,6 +688,7 @@ namespace lsp
         {
             "Multi-band Expander Mono x8",
             "Multiband Expander Mono x8",
+            "MB Expander Mono",
             "MBE8M",
             &developers::v_sadovnikov,
             "mb_expander_mono",
@@ -712,6 +713,7 @@ namespace lsp
         {
             "Multi-band Expander Stereo x8",
             "Multiband Expander Stereo x8",
+            "MB Expander Stereo",
             "MBE8S",
             &developers::v_sadovnikov,
             "mb_expander_stereo",
@@ -736,6 +738,7 @@ namespace lsp
         {
             "Multi-band Expander LeftRight x8",
             "Multiband Expander LeftRight x8",
+            "MB Expander L/R",
             "MBE8LR",
             &developers::v_sadovnikov,
             "mb_expander_lr",
@@ -760,6 +763,7 @@ namespace lsp
         {
             "Multi-band Expander MidSide x8",
             "Multiband Expander MidSide x8",
+            "MB Expander M/S",
             "MBE8MS",
             &developers::v_sadovnikov,
             "mb_expander_ms",
@@ -785,6 +789,7 @@ namespace lsp
         {
             "Sidechain Multi-band Expander Mono x8",
             "Sidechain Multiband Expander Mono x8",
+            "SC MB Expander Mono",
             "SCMBE8M",
             &developers::v_sadovnikov,
             "sc_mb_expander_mono",
@@ -809,6 +814,7 @@ namespace lsp
         {
             "Sidechain Multi-band Expander Stereo x8",
             "Sidechain Multiband Expander Stereo x8",
+            "SC MB Expander Stereo",
             "SCMBE8S",
             &developers::v_sadovnikov,
             "sc_mb_expander_stereo",
@@ -833,6 +839,7 @@ namespace lsp
         {
             "Sidechain Multi-band Expander LeftRight x8",
             "Sidechain Multiband Expander LeftRight x8",
+            "SC MB Expander L/R",
             "SCMBE8LR",
             &developers::v_sadovnikov,
             "sc_mb_expander_lr",
@@ -857,6 +864,7 @@ namespace lsp
         {
             "Sidechain Multi-band Expander MidSide x8",
             "Sidechain Multiband Expander MidSide x8",
+            "SC MB Expander M/S",
             "SCMBE8MS",
             &developers::v_sadovnikov,
             "sc_mb_expander_ms",
