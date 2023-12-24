@@ -1301,15 +1301,13 @@ namespace lsp
                     }
                 }
 
-                // Do frequency boost and input channel analysis
+                // Do frequency boost
                 for (size_t i=0; i<channels; ++i)
                 {
                     channel_t *c        = &vChannels[i];
                     c->sEnvBoost[0].process(c->vScBuffer, c->vInAnalyze, to_process);
                     if (bSidechain)
                         c->sEnvBoost[1].process(c->vExtScBuffer, c->vExtScBuffer, to_process);
-
-                    vAnalyze[c->nAnInChannel] = c->vInAnalyze;
                 }
 
                 // MAIN PLUGIN STUFF
@@ -1456,15 +1454,18 @@ namespace lsp
 
                 // MAIN PLUGIN STUFF END
 
-                // Do output channel analysis
-                for (size_t i=0; i<channels; ++i)
-                {
-                    channel_t *c        = &vChannels[i];
-                    vAnalyze[c->nAnOutChannel] = c->vBuffer;
-                }
-
+                // Do input and output channel analysis
                 if (sAnalyzer.activity())
+                {
+                    for (size_t i=0; i<channels; ++i)
+                    {
+                        channel_t *c        = &vChannels[i];
+                        vAnalyze[c->nAnInChannel]   = c->vInAnalyze;
+                        vAnalyze[c->nAnOutChannel]  = c->vBuffer;
+                    }
+
                     sAnalyzer.process(vAnalyze, to_process);
+                }
 
                 // Post-process data (if needed)
                 if (nMode == MBEM_MS)
