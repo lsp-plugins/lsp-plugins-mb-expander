@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2023 Linux Studio Plugins Project <https://lsp-plug.in/>
- *           (C) 2023 Vladimir Sadovnikov <sadko4u@gmail.com>
+ * Copyright (C) 2024 Linux Studio Plugins Project <https://lsp-plug.in/>
+ *           (C) 2024 Vladimir Sadovnikov <sadko4u@gmail.com>
  *
  * This file is part of lsp-plugins-mb-expander
  * Created on: 3 авг. 2021 г.
@@ -695,6 +695,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_mono"),
             LSP_LV2UI_URI("mb_expander_mono"),
             "mygo",
+            LSP_VST3_UID("mbe8m   mygo"),
+            LSP_VST3UI_UID("mbe8m   mygo"),
             LSP_LADSPA_MB_EXPANDER_BASE + 0,
             LSP_LADSPA_URI("mb_expander_mono"),
             LSP_CLAP_URI("mb_expander_mono"),
@@ -720,6 +722,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_stereo"),
             LSP_LV2UI_URI("mb_expander_stereo"),
             "hobt",
+            LSP_VST3_UID("mbe8s   hobt"),
+            LSP_VST3UI_UID("mbe8s   hobt"),
             LSP_LADSPA_MB_EXPANDER_BASE + 1,
             LSP_LADSPA_URI("mb_expander_stereo"),
             LSP_CLAP_URI("mb_expander_stereo"),
@@ -745,6 +749,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_lr"),
             LSP_LV2UI_URI("mb_expander_lr"),
             "bfmk",
+            LSP_VST3_UID("mbe8lr  bfmk"),
+            LSP_VST3UI_UID("mbe8lr  bfmk"),
             LSP_LADSPA_MB_EXPANDER_BASE + 2,
             LSP_LADSPA_URI("mb_expander_lr"),
             LSP_CLAP_URI("mb_expander_lr"),
@@ -770,6 +776,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_ms"),
             LSP_LV2UI_URI("mb_expander_ms"),
             "ulte",
+            LSP_VST3_UID("mbe8ms  ulte"),
+            LSP_VST3UI_UID("mbe8ms  ulte"),
             LSP_LADSPA_MB_EXPANDER_BASE + 3,
             LSP_LADSPA_URI("mb_expander_ms"),
             LSP_CLAP_URI("mb_expander_ms"),
@@ -796,6 +804,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_mono"),
             LSP_LV2UI_URI("sc_mb_expander_mono"),
             "szkf",
+            LSP_VST3_UID("scmbe8m szkf"),
+            LSP_VST3UI_UID("scmbe8m szkf"),
             LSP_LADSPA_MB_EXPANDER_BASE + 4,
             LSP_LADSPA_URI("sc_mb_expander_mono"),
             LSP_CLAP_URI("sc_mb_expander_mono"),
@@ -821,6 +831,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_stereo"),
             LSP_LV2UI_URI("sc_mb_expander_stereo"),
             "f0qr",
+            LSP_VST3_UID("scmbe8s f0qr"),
+            LSP_VST3UI_UID("scmbe8s f0qr"),
             LSP_LADSPA_MB_EXPANDER_BASE + 5,
             LSP_LADSPA_URI("sc_mb_expander_stereo"),
             LSP_CLAP_URI("sc_mb_expander_stereo"),
@@ -846,6 +858,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_lr"),
             LSP_LV2UI_URI("sc_mb_expander_lr"),
             "kxdv",
+            LSP_VST3_UID("scmbe8lrkxdv"),
+            LSP_VST3UI_UID("scmbe8lrkxdv"),
             LSP_LADSPA_MB_EXPANDER_BASE + 6,
             LSP_LADSPA_URI("sc_mb_expander_lr"),
             LSP_CLAP_URI("sc_mb_expander_lr"),
@@ -871,6 +885,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_ms"),
             LSP_LV2UI_URI("sc_mb_expander_ms"),
             "wkge",
+            LSP_VST3_UID("scmbe8mswkge"),
+            LSP_VST3UI_UID("scmbe8mswkge"),
             LSP_LADSPA_MB_EXPANDER_BASE + 7,
             LSP_LADSPA_URI("sc_mb_expander_ms"),
             LSP_CLAP_URI("sc_mb_expander_ms"),
