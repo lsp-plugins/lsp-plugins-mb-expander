@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2023 Linux Studio Plugins Project <https://lsp-plug.in/>
- *           (C) 2023 Vladimir Sadovnikov <sadko4u@gmail.com>
+ * Copyright (C) 2024 Linux Studio Plugins Project <https://lsp-plug.in/>
+ *           (C) 2024 Vladimir Sadovnikov <sadko4u@gmail.com>
  *
  * This file is part of lsp-plugins-mb-expander
  * Created on: 3 авг. 2021 г.
@@ -128,6 +128,7 @@ namespace lsp
                     plug::IPort        *pAttTime;           // Attack time
                     plug::IPort        *pRelLevel;          // Release level
                     plug::IPort        *pRelTime;           // Release time
+                    plug::IPort        *pHold;              // Hold time
                     plug::IPort        *pRatio;             // Ratio
                     plug::IPort        *pKnee;              // Knee
                     plug::IPort        *pMakeup;            // Makeup gain
@@ -226,6 +227,7 @@ namespace lsp
                 plug::IPort            *pOutGain;               // Output gain port
                 plug::IPort            *pDryGain;               // Dry gain port
                 plug::IPort            *pWetGain;               // Wet gain port
+                plug::IPort            *pDryWet;                // Dry/Wet gain balance port
                 plug::IPort            *pReactivity;            // Reactivity
                 plug::IPort            *pShiftGain;             // Shift gain port
                 plug::IPort            *pZoom;                  // Zoom port
@@ -244,7 +246,12 @@ namespace lsp
 
             public:
                 explicit mb_expander(const meta::plugin_t *metadata, bool sc, size_t mode);
+                mb_expander(const mb_expander &) = delete;
+                mb_expander(mb_expander &&) = delete;
                 virtual ~mb_expander() override;
+
+                mb_expander & operator = (const mb_expander &) = delete;
+                mb_expander & operator = (mb_expander &&) = delete;
 
                 virtual void        init(plug::IWrapper *wrapper, plug::IPort **ports) override;
                 virtual void        destroy() override;

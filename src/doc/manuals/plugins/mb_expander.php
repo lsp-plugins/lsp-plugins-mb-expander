@@ -93,6 +93,7 @@
 	<li><b>Output</b> - the amount of gain applied to the output signal before processing.</li>
 	<li><b>Dry</b> - the amount of dry (unprocessed) signal passed to the output.</li>
 	<li><b>Wet</b> - the amount of wet (processed) signal passed to the output.</li>
+	<li><b>Dry/Wet</b> - the knob that controls the balance between the mixed dry and wet signal (see <b>Dry</b> and <b>Wet</b>) and the dry (unprocessed) signal.</li>
 	<li><b>In</b> - the input signal meter.</li>
 	<li><b>Out</b> - the output signal meter.</li>
 </ul>
@@ -183,5 +184,6 @@
 	<li><b>Expander Attack Time</b> - attack time of the expander.</li>
 	<li><b>Expander Release Level</b> - relative to the <b>Attack Level</b> threshold that sets up the threshold of <b>Release Time</b>.</li>
 	<li><b>Expander Release Time</b> - release time of the expander.</li>
+	<li><b>Expander Hold</b> - the time period the envelope holds it's maximum value before starting the release.</li>
 	<li><b>Gain</b> - the amount of gain applied to frequency band by the expander curve.</li>
 </ul>
