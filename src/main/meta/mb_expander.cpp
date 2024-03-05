@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2023 Linux Studio Plugins Project <https://lsp-plug.in/>
- *           (C) 2023 Vladimir Sadovnikov <sadko4u@gmail.com>
+ * Copyright (C) 2024 Linux Studio Plugins Project <https://lsp-plug.in/>
+ *           (C) 2024 Vladimir Sadovnikov <sadko4u@gmail.com>
  *
  * This file is part of lsp-plugins-mb-expander
  * Created on: 3 авг. 2021 г.
@@ -26,7 +26,7 @@
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MAJOR       1
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MINOR       0
-#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       16
+#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       17
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION  \
     LSP_MODULE_VERSION( \
@@ -152,6 +152,7 @@ namespace lsp
             AMP_GAIN("g_out", "Output gain", mb_expander_metadata::OUT_GAIN_DFL, 10.0f), \
             AMP_GAIN("g_dry", "Dry gain", 0.0f, 10.0f), \
             AMP_GAIN("g_wet", "Wet gain", 1.0f, 10.0f), \
+            PERCENTS("drywet", "Dry/Wet balance", 100.0f, 0.1f), \
             LOG_CONTROL("react", "FFT reactivity", U_MSEC, mb_expander_metadata::FFT_REACT_TIME), \
             AMP_GAIN("shift", "Shift gain", 1.0f, 100.0f), \
             LOG_CONTROL("zoom", "Graph zoom", U_GAIN_AMP, mb_expander_metadata::ZOOM), \
@@ -175,7 +176,7 @@ namespace lsp
             SWITCH("schc" id, "Sidechain custom hi-cut" label, 0), \
             LOG_CONTROL_DFL("sclf" id, "Sidechain lo-cut frequency" label, U_HZ, mb_expander_metadata::FREQ, fe), \
             LOG_CONTROL_DFL("schf" id, "Sidechain hi-cut frequency" label, U_HZ, mb_expander_metadata::FREQ, fs), \
-            MESH("bfc" id, "Side-chain band frequency chart" label, 2, mb_expander_metadata::FILTER_MESH_POINTS), \
+            MESH("bfc" id, "Side-chain band frequency chart" label, 2, mb_expander_metadata::MESH_POINTS + 4), \
             \
             COMBO("em" id, "Expander mode" label, mb_expander_metadata::EM_DEFAULT, mb_exp_modes), \
             SWITCH("ee" id, "Expander enable" label, 1.0f), \
@@ -185,6 +186,7 @@ namespace lsp
             LOG_CONTROL("at" id, "Attack time" label, U_MSEC, mb_expander_metadata::ATTACK_TIME), \
             LOG_CONTROL("rrl" id, "Release threshold" label, U_GAIN_AMP, mb_expander_metadata::RELEASE_LVL), \
             LOG_CONTROL("rt" id, "Release time" label, U_MSEC, mb_expander_metadata::RELEASE_TIME), \
+            CONTROL("ht" id, "Hold time" label, U_MSEC, mb_expander_metadata::HOLD_TIME), \
             LOG_CONTROL("er" id, "Ratio" label, U_NONE, mb_expander_metadata::RATIO), \
             LOG_CONTROL("kn" id, "Knee" label, U_GAIN_AMP, mb_expander_metadata::KNEE), \
             LOG_CONTROL("mk" id, "Makeup gain" label, U_GAIN_AMP, mb_expander_metadata::MAKEUP), \
@@ -695,6 +697,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_mono"),
             LSP_LV2UI_URI("mb_expander_mono"),
             "mygo",
+            LSP_VST3_UID("mbe8m   mygo"),
+            LSP_VST3UI_UID("mbe8m   mygo"),
             LSP_LADSPA_MB_EXPANDER_BASE + 0,
             LSP_LADSPA_URI("mb_expander_mono"),
             LSP_CLAP_URI("mb_expander_mono"),
@@ -720,6 +724,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_stereo"),
             LSP_LV2UI_URI("mb_expander_stereo"),
             "hobt",
+            LSP_VST3_UID("mbe8s   hobt"),
+            LSP_VST3UI_UID("mbe8s   hobt"),
             LSP_LADSPA_MB_EXPANDER_BASE + 1,
             LSP_LADSPA_URI("mb_expander_stereo"),
             LSP_CLAP_URI("mb_expander_stereo"),
@@ -745,6 +751,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_lr"),
             LSP_LV2UI_URI("mb_expander_lr"),
             "bfmk",
+            LSP_VST3_UID("mbe8lr  bfmk"),
+            LSP_VST3UI_UID("mbe8lr  bfmk"),
             LSP_LADSPA_MB_EXPANDER_BASE + 2,
             LSP_LADSPA_URI("mb_expander_lr"),
             LSP_CLAP_URI("mb_expander_lr"),
@@ -770,6 +778,8 @@ namespace lsp
             LSP_LV2_URI("mb_expander_ms"),
             LSP_LV2UI_URI("mb_expander_ms"),
             "ulte",
+            LSP_VST3_UID("mbe8ms  ulte"),
+            LSP_VST3UI_UID("mbe8ms  ulte"),
             LSP_LADSPA_MB_EXPANDER_BASE + 3,
             LSP_LADSPA_URI("mb_expander_ms"),
             LSP_CLAP_URI("mb_expander_ms"),
@@ -796,6 +806,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_mono"),
             LSP_LV2UI_URI("sc_mb_expander_mono"),
             "szkf",
+            LSP_VST3_UID("scmbe8m szkf"),
+            LSP_VST3UI_UID("scmbe8m szkf"),
             LSP_LADSPA_MB_EXPANDER_BASE + 4,
             LSP_LADSPA_URI("sc_mb_expander_mono"),
             LSP_CLAP_URI("sc_mb_expander_mono"),
@@ -821,6 +833,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_stereo"),
             LSP_LV2UI_URI("sc_mb_expander_stereo"),
             "f0qr",
+            LSP_VST3_UID("scmbe8s f0qr"),
+            LSP_VST3UI_UID("scmbe8s f0qr"),
             LSP_LADSPA_MB_EXPANDER_BASE + 5,
             LSP_LADSPA_URI("sc_mb_expander_stereo"),
             LSP_CLAP_URI("sc_mb_expander_stereo"),
@@ -846,6 +860,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_lr"),
             LSP_LV2UI_URI("sc_mb_expander_lr"),
             "kxdv",
+            LSP_VST3_UID("scmbe8lrkxdv"),
+            LSP_VST3UI_UID("scmbe8lrkxdv"),
             LSP_LADSPA_MB_EXPANDER_BASE + 6,
             LSP_LADSPA_URI("sc_mb_expander_lr"),
             LSP_CLAP_URI("sc_mb_expander_lr"),
@@ -871,6 +887,8 @@ namespace lsp
             LSP_LV2_URI("sc_mb_expander_ms"),
             LSP_LV2UI_URI("sc_mb_expander_ms"),
             "wkge",
+            LSP_VST3_UID("scmbe8mswkge"),
+            LSP_VST3UI_UID("scmbe8mswkge"),
             LSP_LADSPA_MB_EXPANDER_BASE + 7,
             LSP_LADSPA_URI("sc_mb_expander_ms"),
             LSP_CLAP_URI("sc_mb_expander_ms"),
