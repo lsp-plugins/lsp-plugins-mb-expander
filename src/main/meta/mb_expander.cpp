@@ -26,7 +26,7 @@
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MAJOR       1
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MINOR       0
-#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       20
+#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       21
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION  \
     LSP_MODULE_VERSION( \
@@ -44,6 +44,21 @@ namespace lsp
         static const int plugin_classes[]           = { C_EXPANDER, -1 };
         static const int clap_features_mono[]       = { CF_AUDIO_EFFECT, CF_MONO, -1 };
         static const int clap_features_stereo[]     = { CF_AUDIO_EFFECT, CF_STEREO, -1 };
+
+        static const port_item_t mb_exp_sc_type[] =
+        {
+            { "Internal",       "sidechain.internal"        },
+            { "Link",           "sidechain.link"            },
+            { NULL, NULL }
+        };
+
+        static const port_item_t mb_exp_sc_type_sc[] =
+        {
+            { "Internal",       "sidechain.internal"        },
+            { "External",       "sidechain.external"        },
+            { "Link",           "sidechain.link"            },
+            { NULL, NULL }
+        };
 
         static const port_item_t mb_exp_sc_modes[] =
         {
@@ -145,6 +160,12 @@ namespace lsp
             { NULL, NULL }
         };
 
+        #define MB_EXP_SHM_LINK_MONO \
+            OPT_RETURN_MONO("link", "shml", "Side-chain shared memory link")
+
+        #define MB_EXP_SHM_LINK_STEREO \
+            OPT_RETURN_STEREO("link", "shml_", "Side-chain shared memory link")
+
         #define MB_COMMON(bands) \
             BYPASS, \
             COMBO("mode", "Expander mode", 1, mb_global_mb_exp_modes), \
@@ -167,7 +188,7 @@ namespace lsp
             SWITCH("cbe" id, "Expander band enable" label, enable), \
             LOG_CONTROL_DFL("sf" id, "Split frequency" label, U_HZ, mb_expander_metadata::FREQ, freq)
 
-        #define MB_MONO_BAND(id, label, x, total, fe, fs) \
+        #define MB_BAND_COMMON(id, label, x, total, fe, fs) \
             COMBO("scm" id, "Sidechain mode" label, mb_expander_metadata::SC_MODE_DFL, mb_exp_sc_modes), \
             CONTROL("sla" id, "Sidechain lookahead" label, U_MSEC, mb_expander_metadata::LOOKAHEAD), \
             LOG_CONTROL("scr" id, "Sidechain reactivity" label, U_MSEC, mb_expander_metadata::REACTIVITY), \
@@ -200,26 +221,35 @@ namespace lsp
             METER_OUT_GAIN("clm" id, "Curve level meter" label, GAIN_AMP_P_36_DB), \
             METER_OUT_GAIN("rlm" id, "Reduction level meter" label, GAIN_AMP_P_24_DB)
 
+        #define MB_MONO_BAND(id, label, x, total, fe, fs) \
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type), \
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
+
         #define MB_STEREO_BAND(id, label, x, total, fe, fs) \
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type), \
             COMBO("scs" id, "Sidechain source" label, 0, mb_exp_sc_source), \
             COMBO("sscs" id, "Split sidechain source" label, 0, mb_exp_sc_split_source), \
-            MB_MONO_BAND(id, label, x, total, fe, fs)
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
 
         #define MB_SPLIT_BAND(id, label, x, total, fe, fs) \
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type), \
             COMBO("scs" id, "Sidechain source" label, 0, mb_exp_sc_source), \
-            MB_MONO_BAND(id, label, x, total, fe, fs)
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
 
         #define MB_SC_MONO_BAND(id, label, x, total, fe, fs) \
-            SWITCH("sce" id, "External sidechain enable" label, 0.0f), \
-            MB_MONO_BAND(id, label, x, total, fe, fs)
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type_sc), \
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
 
         #define MB_SC_STEREO_BAND(id, label, x, total, fe, fs) \
-            SWITCH("sce" id, "External sidechain enable" label, 0.0f), \
-            MB_STEREO_BAND(id, label, x, total, fe, fs)
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type_sc), \
+            COMBO("scs" id, "Sidechain source" label, 0, mb_exp_sc_source), \
+            COMBO("sscs" id, "Split sidechain source" label, 0, mb_exp_sc_split_source), \
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
 
         #define MB_SC_SPLIT_BAND(id, label, x, total, fe, fs) \
-            SWITCH("sce" id, "External sidechain enable" label, 0.0f), \
-            MB_SPLIT_BAND(id, label, x, total, fe, fs)
+            COMBO("sce" id, "External sidechain source" label, 0.0f, mb_exp_sc_type_sc), \
+            COMBO("scs" id, "Sidechain source" label, 0, mb_exp_sc_source), \
+            MB_BAND_COMMON(id, label, x, total, fe, fs)
 
         #define MB_STEREO_CHANNEL \
             SWITCH("flt", "Band filter curves", 1.0f), \
@@ -241,6 +271,7 @@ namespace lsp
         static const port_t mb_expander_mono_ports[] =
         {
             PORTS_MONO_PLUGIN,
+            MB_EXP_SHM_LINK_MONO,
             MB_COMMON(exp_sc_bands),
             MB_CHANNEL("", ""),
             MB_FFT_METERS("", ""),
@@ -278,6 +309,7 @@ namespace lsp
         static const port_t mb_expander_stereo_ports[] =
         {
             PORTS_STEREO_PLUGIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_bands),
             MB_STEREO_CHANNEL,
             MB_FFT_METERS("_l", " Left"),
@@ -326,6 +358,7 @@ namespace lsp
         static const port_t mb_expander_lr_ports[] =
         {
             PORTS_STEREO_PLUGIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_lr_bands),
             MB_CHANNEL("_l", " Left"),
             MB_CHANNEL("_r", " Right"),
@@ -392,6 +425,7 @@ namespace lsp
         static const port_t mb_expander_ms_ports[] =
         {
             PORTS_STEREO_PLUGIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_ms_bands),
             MB_CHANNEL("_m", " Mid"),
             MB_CHANNEL("_s", " Side"),
@@ -459,6 +493,7 @@ namespace lsp
         {
             PORTS_MONO_PLUGIN,
             PORTS_MONO_SIDECHAIN,
+            MB_EXP_SHM_LINK_MONO,
             MB_COMMON(exp_sc_bands),
             MB_CHANNEL("", ""),
             MB_FFT_METERS("", ""),
@@ -497,6 +532,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_bands),
             MB_STEREO_CHANNEL,
             MB_FFT_METERS("_l", " Left"),
@@ -546,6 +582,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_lr_bands),
             MB_CHANNEL("_l", " Left"),
             MB_CHANNEL("_r", " Right"),
@@ -613,6 +650,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
+            MB_EXP_SHM_LINK_STEREO,
             MB_COMMON(exp_sc_ms_bands),
             MB_CHANNEL("_m", " Mid"),
             MB_CHANNEL("_s", " Side"),
