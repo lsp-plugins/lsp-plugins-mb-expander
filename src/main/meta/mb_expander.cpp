@@ -190,7 +190,7 @@ namespace lsp
 
         #define MB_BAND_COMMON(id, label, alias, x, total, fe, fs) \
             COMBO("scm" id, "Sidechain mode" label, "SC mode" alias, mb_expander_metadata::SC_MODE_DFL, mb_exp_sc_modes), \
-            CONTROL("sla" id, "Sidechain lookahead" label, U_MSEC, mb_expander_metadata::LOOKAHEAD), \
+            CONTROL("sla" id, "Sidechain lookahead" label, "SC look" alias, U_MSEC, mb_expander_metadata::LOOKAHEAD), \
             LOG_CONTROL("scr" id, "Sidechain reactivity" label, "SC react" alias, U_MSEC, mb_expander_metadata::REACTIVITY), \
             AMP_GAIN100("scp" id, "Sidechain preamp" label, GAIN_AMP_0_DB), \
             SWITCH("sclc" id, "Sidechain custom lo-cut" label, "SC LCF on" alias, 0), \
@@ -207,7 +207,7 @@ namespace lsp
             LOG_CONTROL("at" id, "Attack time" label, "Att time" alias, U_MSEC, mb_expander_metadata::ATTACK_TIME), \
             LOG_CONTROL("rrl" id, "Release threshold" label, "Rel thresh" alias, U_GAIN_AMP, mb_expander_metadata::RELEASE_LVL), \
             LOG_CONTROL("rt" id, "Release time" label, "Rel time" alias, U_MSEC, mb_expander_metadata::RELEASE_TIME), \
-            CONTROL("ht" id, "Hold time" label, U_MSEC, mb_expander_metadata::HOLD_TIME), \
+            CONTROL("ht" id, "Hold time" label, "Hold time" alias, U_MSEC, mb_expander_metadata::HOLD_TIME), \
             LOG_CONTROL("er" id, "Ratio" label, "Ratio" alias, U_NONE, mb_expander_metadata::RATIO), \
             LOG_CONTROL("kn" id, "Knee" label, "Knee" alias, U_GAIN_AMP, mb_expander_metadata::KNEE), \
             LOG_CONTROL("mk" id, "Makeup gain" label, "Makeup" alias, U_GAIN_AMP, mb_expander_metadata::MAKEUP), \
