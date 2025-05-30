@@ -166,6 +166,18 @@ namespace lsp
         #define MB_EXP_SHM_LINK_STEREO \
             OPT_RETURN_STEREO("link", "shml_", "Side-chain shared memory link")
 
+        #define MB_EXP_PREMIX \
+            SWITCH("showpmx", "Show pre-mix overlay", "Show premix bar", 0.0f), \
+            AMP_GAIN10("in2lk", "Input to Link mix", "In to Link mix", GAIN_AMP_M_INF_DB), \
+            AMP_GAIN10("lk2in", "Link to Input mix", "Link to In mix", GAIN_AMP_M_INF_DB), \
+            AMP_GAIN10("lk2sc", "Link to Sidechain mix", "Link to SC mix", GAIN_AMP_M_INF_DB)
+
+        #define MB_EXP_SC_PREMIX \
+            MB_EXP_PREMIX, \
+            AMP_GAIN10("in2sc", "Input to Sidechain mix", "In to SC mix", GAIN_AMP_M_INF_DB), \
+            AMP_GAIN10("sc2in", "Sidechain to Input mix", "SC to In mix", GAIN_AMP_M_INF_DB), \
+            AMP_GAIN10("sc2lk", "Sidechain to Link mix", "SC to Link mix", GAIN_AMP_M_INF_DB)
+
         #define MB_COMMON(bands) \
             BYPASS, \
             COMBO("mode", "Expander mode", "Mode", 1, mb_global_mb_exp_modes), \
@@ -272,6 +284,7 @@ namespace lsp
         {
             PORTS_MONO_PLUGIN,
             MB_EXP_SHM_LINK_MONO,
+            MB_EXP_PREMIX,
             MB_COMMON(exp_sc_bands),
             MB_CHANNEL("", "", ""),
             MB_FFT_METERS("", "", ""),
@@ -310,6 +323,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_PREMIX,
             MB_COMMON(exp_sc_bands),
             MB_STEREO_CHANNEL,
             MB_FFT_METERS("_l", " Left", " L"),
@@ -359,6 +373,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_PREMIX,
             MB_COMMON(exp_sc_lr_bands),
             MB_CHANNEL("_l", " Left", " L"),
             MB_CHANNEL("_r", " Right", " R"),
@@ -426,6 +441,7 @@ namespace lsp
         {
             PORTS_STEREO_PLUGIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_PREMIX,
             MB_COMMON(exp_sc_ms_bands),
             MB_CHANNEL("_m", " Mid", " M"),
             MB_CHANNEL("_s", " Side", " S"),
@@ -494,6 +510,7 @@ namespace lsp
             PORTS_MONO_PLUGIN,
             PORTS_MONO_SIDECHAIN,
             MB_EXP_SHM_LINK_MONO,
+            MB_EXP_SC_PREMIX,
             MB_COMMON(exp_sc_bands),
             MB_CHANNEL("", "", ""),
             MB_FFT_METERS("", "", ""),
@@ -533,6 +550,7 @@ namespace lsp
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_SC_PREMIX,
             MB_COMMON(exp_sc_bands),
             MB_STEREO_CHANNEL,
             MB_FFT_METERS("_l", " Left", " L"),
@@ -583,6 +601,7 @@ namespace lsp
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_SC_PREMIX,
             MB_COMMON(exp_sc_lr_bands),
             MB_CHANNEL("_l", " Left", " L"),
             MB_CHANNEL("_r", " Right", " R"),
@@ -651,6 +670,7 @@ namespace lsp
             PORTS_STEREO_PLUGIN,
             PORTS_STEREO_SIDECHAIN,
             MB_EXP_SHM_LINK_STEREO,
+            MB_EXP_SC_PREMIX,
             MB_COMMON(exp_sc_ms_bands),
             MB_CHANNEL("_m", " Mid", " M"),
             MB_CHANNEL("_s", " Side", " S"),
@@ -720,7 +740,11 @@ namespace lsp
             "Multiband Expander",
             B_MB_DYNAMICS,
             "TR_Ox7U_a84",
-            "This plugin performs multiband expansion of input signsl. Flexible sidechain\ncontrol configuration provided. As opposite to most available multiband\nexpanders, this expander provides numerous special functions: 'modern'\noperating mode, 'Sidechain boost', 'Lookahead' option and up to 8 frequency\nbands for processing."
+            "This plugin performs multiband expansion of input signal. Flexible sidechain\n"
+            "control configuration provided. As opposite to most available multiband\n"
+            "expanders, this expander provides numerous special functions: 'modern'\n"
+            "operating mode, 'Sidechain boost', 'Lookahead' option and up to 8 frequency\n"
+            "bands for processing."
         };
 
         // Multiband Expander

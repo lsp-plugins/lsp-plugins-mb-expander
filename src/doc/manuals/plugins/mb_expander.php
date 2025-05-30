@@ -82,6 +82,7 @@
 	<li><b>Link</b> - the name of shared memory link used to receive sidechain signal</li>
 	<li><b>FFT<?= $sm ?> In</b> - enables FFT curve graph of input signal on the spectrum graph.</li>
 	<li><b>FFT<?= $sm ?> Out</b> - enables FFT curve graph of output signal on the spectrum graph.</li>
+	<li><b>Pre-mix</b> - shows pre-mix control overlay.</li>
 	<li><b>Filters<?= $sm ?></b> - enables drawing tranfer function of each sidechain filter on the spectrum graph.</li>
 	<?php if ($m == 's') { ?>
 	<li><b>Stereo Split</b> - enables independent processing of left and right channels.</li>
@@ -191,3 +192,18 @@
 	<li><b>Expander Hold</b> - the time period the envelope holds it's maximum value before starting the release.</li>
 	<li><b>Gain</b> - the amount of gain applied to frequency band by the expander curve.</li>
 </ul>
+
+<p><b>Pre-mix control overlay:</b></p>
+<ul>
+	<?php if ($sc) { ?>
+	<li><b>In -> SC</b> - the amount of signal from input channel added to the Sidechain.</li>
+	<?php } ?>
+	<li><b>In -> Link</b> - the amount of signal from input channel added to the shared memory link.</li>
+	<?php if ($sc) { ?>
+	<li><b>SC -> In</b> - the amount of signal from sidechain input channel added to the input channel.</li>
+	<li><b>SC -> Link</b> - the amount of signal from sidechain input channel added to the shared memory link.</li>
+	<?php } ?>
+	<li><b>Link -> In</b> - the amount of signal from shared memory link added to the input channel.</li>
+	<li><b>Link -> SC</b> - the amount of signal from shared memory link added to the sidechain channel.</li>
+</ul>
+
