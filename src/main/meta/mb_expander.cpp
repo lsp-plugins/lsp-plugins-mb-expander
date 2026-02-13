@@ -779,7 +779,7 @@ namespace lsp
             clap_features_mono,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_mono_ports,
-            "dynamics/expander/multiband/mono.xml",
+            "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_port_groups,
             &mb_expander_bundle
@@ -810,7 +810,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_stereo_ports,
-            "dynamics/expander/multiband/stereo.xml",
+            "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_port_groups,
             &mb_expander_bundle
@@ -841,7 +841,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_lr_ports,
-            "dynamics/expander/multiband/lr.xml",
+            "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_port_groups,
             &mb_expander_bundle
@@ -872,7 +872,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_ms_ports,
-            "dynamics/expander/multiband/ms.xml",
+            "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_port_groups,
             &mb_expander_bundle
@@ -903,7 +903,7 @@ namespace lsp
             clap_features_mono,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_mono_ports,
-            "dynamics/expander/multiband/mono.xml",
+            "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_sidechain_port_groups,
             &mb_expander_bundle
@@ -934,7 +934,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_stereo_ports,
-            "dynamics/expander/multiband/stereo.xml",
+            "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
             &mb_expander_bundle
@@ -965,7 +965,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_lr_ports,
-            "dynamics/expander/multiband/lr.xml",
+            "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
             &mb_expander_bundle
@@ -996,7 +996,7 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_ms_ports,
-            "dynamics/expander/multiband/ms.xml",
+            "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
             &mb_expander_bundle
