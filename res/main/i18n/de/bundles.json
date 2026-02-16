@@ -4,14 +4,13 @@
 		"name": "Multiband Expander"
 	},
 	"launcher": {
-		"mb_expander_lr": "Split LR",
+		"mb_expander_lr": "LR",
 		"mb_expander_mono": "Mono",
-		"mb_expander_ms": "Split MS",
+		"mb_expander_ms": "MS",
 		"mb_expander_stereo": "Stereo",
-		"sc_mb_expander_lr": "SC Split LR",
+		"sc_mb_expander_lr": "SC LR",
 		"sc_mb_expander_mono": "SC Mono",
-		"sc_mb_expander_ms": "SC Split MS",
+		"sc_mb_expander_ms": "SC MS",
 		"sc_mb_expander_stereo": "SC Stereo"
 	}
 }
-

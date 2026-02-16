@@ -782,7 +782,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            3
         };
         LSP_REGISTER_METADATA(mb_expander_mono);
 
@@ -813,7 +814,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            1
         };
         LSP_REGISTER_METADATA(mb_expander_stereo);
 
@@ -844,7 +846,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            5
         };
         LSP_REGISTER_METADATA(mb_expander_lr);
 
@@ -875,7 +878,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            7
         };
         LSP_REGISTER_METADATA(mb_expander_ms);
 
@@ -906,7 +910,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            4
         };
         LSP_REGISTER_METADATA(sc_mb_expander_mono);
 
@@ -937,7 +942,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            2
         };
         LSP_REGISTER_METADATA(sc_mb_expander_stereo);
 
@@ -968,7 +974,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            6
         };
         LSP_REGISTER_METADATA(sc_mb_expander_lr);
 
@@ -999,7 +1006,8 @@ namespace lsp
             "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            8
         };
         LSP_REGISTER_METADATA(sc_mb_expander_ms);
 
