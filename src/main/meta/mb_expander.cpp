@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2025 Linux Studio Plugins Project <https://lsp-plug.in/>
- *           (C) 2025 Vladimir Sadovnikov <sadko4u@gmail.com>
+ * Copyright (C) 2026 Linux Studio Plugins Project <https://lsp-plug.in/>
+ *           (C) 2026 Vladimir Sadovnikov <sadko4u@gmail.com>
  *
  * This file is part of lsp-plugins-mb-expander
  * Created on: 3 авг. 2021 г.
@@ -20,13 +20,14 @@
  */
 
 #include <lsp-plug.in/plug-fw/meta/ports.h>
+#include <lsp-plug.in/plug-fw/meta/registry.h>
 #include <lsp-plug.in/shared/meta/developers.h>
 #include <lsp-plug.in/dsp-units/util/Sidechain.h>
 #include <private/meta/mb_expander.h>
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MAJOR       1
 #define LSP_PLUGINS_MB_EXPANDER_VERSION_MINOR       0
-#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       29
+#define LSP_PLUGINS_MB_EXPANDER_VERSION_MICRO       30
 
 #define LSP_PLUGINS_MB_EXPANDER_VERSION  \
     LSP_MODULE_VERSION( \
@@ -778,11 +779,13 @@ namespace lsp
             clap_features_mono,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_mono_ports,
-            "dynamics/expander/multiband/mono.xml",
+            "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            3
         };
+        LSP_REGISTER_METADATA(mb_expander_mono);
 
         const meta::plugin_t  mb_expander_stereo =
         {
@@ -808,11 +811,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_stereo_ports,
-            "dynamics/expander/multiband/stereo.xml",
+            "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            1
         };
+        LSP_REGISTER_METADATA(mb_expander_stereo);
 
         const meta::plugin_t  mb_expander_lr =
         {
@@ -838,11 +843,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_lr_ports,
-            "dynamics/expander/multiband/lr.xml",
+            "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            5
         };
+        LSP_REGISTER_METADATA(mb_expander_lr);
 
         const meta::plugin_t  mb_expander_ms =
         {
@@ -868,12 +875,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             mb_expander_ms_ports,
-            "dynamics/expander/multiband/ms.xml",
+            "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            7
         };
-
+        LSP_REGISTER_METADATA(mb_expander_ms);
 
         const meta::plugin_t  sc_mb_expander_mono =
         {
@@ -899,11 +907,13 @@ namespace lsp
             clap_features_mono,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_mono_ports,
-            "dynamics/expander/multiband/mono.xml",
+            "plugins/dynamics/expander/multiband/mono.xml",
             NULL,
             mono_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            4
         };
+        LSP_REGISTER_METADATA(sc_mb_expander_mono);
 
         const meta::plugin_t  sc_mb_expander_stereo =
         {
@@ -929,11 +939,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_stereo_ports,
-            "dynamics/expander/multiband/stereo.xml",
+            "plugins/dynamics/expander/multiband/stereo.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            2
         };
+        LSP_REGISTER_METADATA(sc_mb_expander_stereo);
 
         const meta::plugin_t  sc_mb_expander_lr =
         {
@@ -959,11 +971,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_lr_ports,
-            "dynamics/expander/multiband/lr.xml",
+            "plugins/dynamics/expander/multiband/lr.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            6
         };
+        LSP_REGISTER_METADATA(sc_mb_expander_lr);
 
         const meta::plugin_t  sc_mb_expander_ms =
         {
@@ -989,10 +1003,13 @@ namespace lsp
             clap_features_stereo,
             E_INLINE_DISPLAY | E_DUMP_STATE,
             sc_mb_expander_ms_ports,
-            "dynamics/expander/multiband/ms.xml",
+            "plugins/dynamics/expander/multiband/ms.xml",
             NULL,
             stereo_plugin_sidechain_port_groups,
-            &mb_expander_bundle
+            &mb_expander_bundle,
+            8
         };
+        LSP_REGISTER_METADATA(sc_mb_expander_ms);
+
     } /* namespace meta */
 } /* namespace lsp */
