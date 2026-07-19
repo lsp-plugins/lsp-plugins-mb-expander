@@ -232,7 +232,7 @@ namespace lsp
         #define MB_BAND_METERS(id, label) \
             METER_OUT_GAIN("elm" id, "Envelope level meter" label, GAIN_AMP_P_36_DB), \
             METER_OUT_GAIN("clm" id, "Curve level meter" label, GAIN_AMP_P_36_DB), \
-            METER_OUT_GAIN("rlm" id, "Reduction level meter" label, GAIN_AMP_P_24_DB)
+            METER_OUT_GAIN("rlm" id, "Reduction level meter" label, GAIN_AMP_P_72_DB)
 
         #define MB_MONO_BAND(id, label, alias, x, total, fe, fs) \
             COMBO("sce" id, "External sidechain source" label, "Ext SC src" alias, 0.0f, mb_exp_sc_type), \
