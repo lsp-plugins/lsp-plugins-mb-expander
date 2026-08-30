@@ -766,7 +766,6 @@ namespace lsp
 
             // Determine number of channels
             size_t channels     = (nMode == MBEM_MONO) ? 1 : 2;
-            int active_channels = 0;
             size_t env_boost    = pEnvBoost->value();
 
             // Determine work mode: classic, modern or linear phase
@@ -825,11 +824,6 @@ namespace lsp
                 sAnalyzer.enable_channel(c->nAnInChannel, c->bInFft);
                 sAnalyzer.enable_channel(c->nAnOutChannel, c->pFftOutSw->value()  >= 0.5f);
 
-                if (sAnalyzer.channel_active(c->nAnInChannel))
-                    active_channels ++;
-                if (sAnalyzer.channel_active(c->nAnOutChannel))
-                    active_channels ++;
-
                 // Update envelope boost filters
                 if ((env_boost != nEnvBoost) || (bEnvUpdate))
                 {
@@ -873,7 +867,6 @@ namespace lsp
             sAnalyzer.set_reactivity(pReactivity->value());
             if (pShiftGain != NULL)
                 sAnalyzer.set_shift(pShiftGain->value() * 100.0f);
-            sAnalyzer.set_activity(active_channels > 0);
 
             // Update analyzer
             if (sAnalyzer.needs_reconfiguration())
@@ -1303,18 +1296,25 @@ namespace lsp
 
         void mb_expander::ui_activated()
         {
-            size_t channels     = (nMode == MBEM_MONO) ? 1 : 2;
+            const size_t channels   = (nMode == MBEM_MONO) ? 1 : 2;
 
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c        = &vChannels[i];
+                channel_t * const c     = &vChannels[i];
 
                 for (size_t j=0; j<c->nPlanSize; ++j)
                 {
-                    exp_band_t *b       = c->vPlan[j];
-                    b->nSync            = S_ALL;
+                    exp_band_t * const b    = c->vPlan[j];
+                    b->nSync                = S_ALL;
                 }
             }
+
+            sAnalyzer.set_activity(true);
+        }
+
+        void mb_expander::ui_deactivated()
+        {
+            sAnalyzer.set_activity(false);
         }
 
         void mb_expander::process_band(void *object, void *subject, size_t band, const float *data, size_t sample, size_t count)
