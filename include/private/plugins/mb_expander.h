@@ -32,7 +32,7 @@
 #include <lsp-plug.in/dsp-units/filters/Filter.h>
 #include <lsp-plug.in/dsp-units/util/Analyzer.h>
 #include <lsp-plug.in/dsp-units/util/Delay.h>
-#include <lsp-plug.in/dsp-units/util/FFTCrossover.h>
+#include <lsp-plug.in/dsp-units/util/LPCrossover.h>
 #include <lsp-plug.in/dsp-units/util/MeterGraph.h>
 #include <lsp-plug.in/dsp-units/util/Sidechain.h>
 
@@ -190,7 +190,7 @@ namespace lsp
                     dspu::Delay         sDryDelay;          // Delay for dry signal
                     dspu::Delay         sXOverDelay;        // Delay for crossover
                     dspu::Equalizer     sDryEq;             // Dry equalizer
-                    dspu::FFTCrossover  sFFTXOver;          // FFT crossover for linear phase
+                    dspu::LPCrossover   sLPXOver;           // Linear phase crossover
 
                     exp_band_t          vBands[meta::mb_expander_metadata::BANDS_MAX];      // Expander bands
                     split_t             vSplit[meta::mb_expander_metadata::BANDS_MAX-1];    // Split bands
