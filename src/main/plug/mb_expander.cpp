@@ -102,8 +102,6 @@ namespace lsp
             fZoom           = GAIN_AMP_0_DB;
             pData           = NULL;
             vTr             = NULL;
-            vPFc             = NULL;
-            vRFc            = NULL;
             vFreqs          = NULL;
             vCurve          = NULL;
             vIndexes        = NULL;
@@ -223,14 +221,14 @@ namespace lsp
         void mb_expander::do_destroy()
         {
             // Determine number of channels
-            size_t channels     = (nMode == MBEM_MONO) ? 1 : 2;
+            const size_t channels   = (nMode == MBEM_MONO) ? 1 : 2;
 
             // Destroy channels
             if (vChannels != NULL)
             {
                 for (size_t i=0; i<channels; ++i)
                 {
-                    channel_t *c    = &vChannels[i];
+                    channel_t * const c = &vChannels[i];
 
                     c->sEnvBoost[0].destroy();
                     c->sEnvBoost[1].destroy();
@@ -239,22 +237,19 @@ namespace lsp
                     c->sDryDelay.destroy();
                     c->sXOverDelay.destroy();
                     c->sDryEq.destroy();
+                    c->sXOver.destroy();
                     c->sLPXOver.destroy();
 
                     c->vBuffer      = NULL;
 
                     for (size_t i=0; i<meta::mb_expander_metadata::BANDS_MAX; ++i)
                     {
-                        exp_band_t *b  = &c->vBands[i];
+                        exp_band_t * const b    = &c->vBands[i];
 
                         b->sEQ[0].destroy();
                         b->sEQ[1].destroy();
                         b->sSC.destroy();
                         b->sScDelay.destroy();
-
-                        b->sPassFilter.destroy();
-                        b->sRejFilter.destroy();
-                        b->sAllFilter.destroy();
                     }
                 }
 
@@ -297,39 +292,39 @@ namespace lsp
 
             sCounter.set_frequency(meta::mb_expander_metadata::FFT_REFRESH_RATE, true);
 
-            size_t filter_mesh_size = align_size(meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float), DEFAULT_ALIGN);
+            const size_t filter_mesh_size   = align_size(meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float), DEFAULT_ALIGN);
+            const size_t buf_size           = MBE_BUFFER_SIZE * sizeof(float);
+            const size_t tmp_buf_size       = lsp_max(filter_mesh_size * 2, buf_size);
 
             // Allocate float buffer data
-            size_t to_alloc =
-                    // Global buffers
-                    2 * filter_mesh_size + // vTr (both complex and real)
-                    2 * filter_mesh_size + // vFc (both complex and real)
-                    2 * filter_mesh_size + // vSig (both complex and real)
-                    meta::mb_expander_metadata::CURVE_MESH_SIZE * sizeof(float) + // Curve
-                    meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float) + // vFreqs array
-                    meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(uint32_t) + // vIndexes array
-                    MBE_BUFFER_SIZE * sizeof(float) + // Global vBuffer for band signal processing
-                    MBE_BUFFER_SIZE * sizeof(float) + // Global vEnv for band signal processing
-                    // Channel buffers
+            const size_t to_alloc =
+                // Global buffers
+                2 * filter_mesh_size + // vTr (both complex and real)
+                filter_mesh_size + // vFreqs array
+                meta::mb_expander_metadata::CURVE_MESH_SIZE * sizeof(float) + // vCurve
+                meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(uint32_t) + // vIndexes array
+                tmp_buf_size + // Global vBuffer for band signal processing
+                buf_size + // Global vEnv for band signal processing
+                // Channel buffers
+                (
+                    buf_size + // Global vSc[] for each channel
+                    buf_size * 3 + // sPremix
+                    buf_size + // vInAnalyze for each channel
+                    buf_size + // vInBuffer for each channel
+                    buf_size + // vBuffer for each channel
+                    ((bSidechain) ? buf_size : 0) + // vScBuffer for each channel
+                    buf_size + // vExtScBuffer for each channel
+                    buf_size + // vShmBuffer
+                    2 * filter_mesh_size + // vTr of each channel
+                    filter_mesh_size + // vTrMem of each channel
+                    // Band buffers
                     (
-                        MBE_BUFFER_SIZE * sizeof(float) * 3 + // sPremix
-                        MBE_BUFFER_SIZE * sizeof(float) + // Global vSc[] for each channel
-                        2 * filter_mesh_size + // vTr of each channel
-                        filter_mesh_size + // vTrMem of each channel
-                        MBE_BUFFER_SIZE * sizeof(float) + // vInAnalyze for each channel
-                        MBE_BUFFER_SIZE * sizeof(float) + // vInBuffer for each channel
-                        MBE_BUFFER_SIZE * sizeof(float) + // vBuffer for each channel
-                        ((bSidechain) ? MBE_BUFFER_SIZE * sizeof(float) : 0) + // vScBuffer for each channel
-                        MBE_BUFFER_SIZE * sizeof(float) + // vExtScBuffer for each channel
-                        MBE_BUFFER_SIZE * sizeof(float) + // vShmLinkBuffer
-                        // Band buffers
-                        (
-                            MBE_BUFFER_SIZE * sizeof(float) + // vBuffer of each band
-                            MBE_BUFFER_SIZE * sizeof(float) + // vVCA of each band
-                            meta::mb_expander_metadata::FFT_MESH_POINTS * 2 * sizeof(float) + // vSc transfer function for each band
-                            meta::mb_expander_metadata::FFT_MESH_POINTS * 2 * sizeof(float) // vTr transfer function for each band
-                        ) * meta::mb_expander_metadata::BANDS_MAX
-                    ) * channels;
+                        buf_size + // vBuffer of each band
+                        buf_size + // vVCA of each band
+                        filter_mesh_size * 2 + // vSc transfer function for each band
+                        filter_mesh_size * 2 // vTr transfer function for each band
+                    ) * meta::mb_expander_metadata::BANDS_MAX
+                ) * channels;
 
             uint8_t *ptr    = alloc_aligned<uint8_t>(pData, to_alloc);
             if (ptr == NULL)
@@ -338,22 +333,19 @@ namespace lsp
 
             // Remember the pointer to frequencies buffer
             vTr             = advance_ptr_bytes<float>(ptr, filter_mesh_size * 2);
-            vPFc            = advance_ptr_bytes<float>(ptr, filter_mesh_size * 2);
-            vRFc            = advance_ptr_bytes<float>(ptr, filter_mesh_size * 2);
-            vFreqs          = advance_ptr_bytes<float>(ptr, meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float));
+            vFreqs          = advance_ptr_bytes<float>(ptr, filter_mesh_size);
             vCurve          = advance_ptr_bytes<float>(ptr, meta::mb_expander_metadata::CURVE_MESH_SIZE * sizeof(float));
             vIndexes        = advance_ptr_bytes<uint32_t>(ptr, meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(uint32_t));
-            vSc[0]          = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-            vSc[1]          = (channels > 1) ? advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float)) : NULL;
-            vBuffer         = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-            vEnv            = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
+            vBuffer         = advance_ptr_bytes<float>(ptr, tmp_buf_size);
+            vEnv            = advance_ptr_bytes<float>(ptr, buf_size);
 
             // Initialize pre-mix
             for (size_t i=0; i<channels; ++i)
             {
-                sPremix.vTmpIn[i]       = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                sPremix.vTmpLink[i]     = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                sPremix.vTmpSc[i]       = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
+                vSc[i]                  = advance_ptr_bytes<float>(ptr, buf_size);
+                sPremix.vTmpIn[i]       = advance_ptr_bytes<float>(ptr, buf_size);
+                sPremix.vTmpLink[i]     = advance_ptr_bytes<float>(ptr, buf_size);
+                sPremix.vTmpSc[i]       = advance_ptr_bytes<float>(ptr, buf_size);
             }
 
             // Initialize filters according to number of bands
@@ -374,6 +366,7 @@ namespace lsp
                 c->sDryDelay.construct();
                 c->sXOverDelay.construct();
                 c->sDryEq.construct();
+                c->sXOver.construct();
                 c->sLPXOver.construct();
 
                 if (!c->sEnvBoost[0].init(NULL))
@@ -386,18 +379,23 @@ namespace lsp
                 c->sDryEq.init(meta::mb_expander_metadata::BANDS_MAX-1, 0);
                 c->sDryEq.set_mode(dspu::EQM_IIR);
 
+                if (!c->sXOver.init(meta::mb_expander_metadata::BANDS_MAX, MBE_BUFFER_SIZE))
+                    return;
+                for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
+                    c->sXOver.set_handler(j, process_band, this, c);                // Bind channel as a handler
+
                 c->nPlanSize    = 0;
                 c->vIn          = NULL;
                 c->vOut         = NULL;
                 c->vScIn        = NULL;
                 c->vShmIn       = NULL;
 
-                c->vInAnalyze   = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                c->vInBuffer    = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                c->vBuffer      = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                c->vScBuffer    = (bSidechain) ? advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float)) : NULL;
-                c->vExtScBuffer = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                c->vShmBuffer   = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
+                c->vInAnalyze   = advance_ptr_bytes<float>(ptr, buf_size);
+                c->vInBuffer    = advance_ptr_bytes<float>(ptr, buf_size);
+                c->vBuffer      = advance_ptr_bytes<float>(ptr, buf_size);
+                c->vScBuffer    = (bSidechain) ? advance_ptr_bytes<float>(ptr, buf_size) : NULL;
+                c->vExtScBuffer = advance_ptr_bytes<float>(ptr, buf_size);
+                c->vShmBuffer   = advance_ptr_bytes<float>(ptr, buf_size);
                 c->vTr          = advance_ptr_bytes<float>(ptr, 2 * filter_mesh_size);
                 c->vTrMem       = advance_ptr_bytes<float>(ptr, filter_mesh_size);
 
@@ -425,30 +423,24 @@ namespace lsp
                 // Initialize bands
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b  = &c->vBands[j];
+                    exp_band_t * const b  = &c->vBands[j];
 
                     if (!b->sSC.init(channels, meta::mb_expander_metadata::REACTIVITY_MAX))
                         return;
-                    if (!b->sPassFilter.init(NULL))
-                        return;
-                    if (!b->sRejFilter.init(NULL))
-                        return;
-                    if (!b->sAllFilter.init(NULL))
-                        return;
 
                     // Initialize sidechain equalizers
-                    b->sEQ[0].init(2, 6);
+                    b->sEQ[0].init(2, 0);
                     b->sEQ[0].set_mode(dspu::EQM_IIR);
                     if (channels > 1)
                     {
-                        b->sEQ[1].init(2, 6);
+                        b->sEQ[1].init(2, 0);
                         b->sEQ[1].set_mode(dspu::EQM_IIR);
                     }
 
-                    b->vBuffer      = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                    b->vVCA         = advance_ptr_bytes<float>(ptr, MBE_BUFFER_SIZE * sizeof(float));
-                    b->vSc          = advance_ptr_bytes<float>(ptr, meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float) * 2);
-                    b->vTr          = advance_ptr_bytes<float>(ptr, meta::mb_expander_metadata::FFT_MESH_POINTS * sizeof(float) * 2);
+                    b->vBuffer      = advance_ptr_bytes<float>(ptr, buf_size);
+                    b->vVCA         = advance_ptr_bytes<float>(ptr, buf_size);
+                    b->vSc          = advance_ptr_bytes<float>(ptr, filter_mesh_size * 2);
+                    b->vTr          = advance_ptr_bytes<float>(ptr, filter_mesh_size * 2);
 
                     b->fScPreamp    = GAIN_AMP_0_DB;
 
@@ -504,13 +496,13 @@ namespace lsp
                 // Initialize split
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX-1; ++j)
                 {
-                    split_t *s      = &c->vSplit[j];
+                    split_t * const s   = &c->vSplit[j];
 
-                    s->bEnabled     = false;
-                    s->fFreq        = 0.0f;
+                    s->bEnabled         = false;
+                    s->fFreq            = 0.0f;
 
-                    s->pEnabled     = NULL;
-                    s->pFreq        = NULL;
+                    s->pEnabled         = NULL;
+                    s->pFreq            = NULL;
                 }
             }
 
@@ -576,7 +568,7 @@ namespace lsp
             lsp_trace("Binding channel ports");
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c    = &vChannels[i];
+                channel_t * const c = &vChannels[i];
 
                 if ((i == 0) || (nMode == MBEM_LR) || (nMode == MBEM_MS))
                     SKIP_PORT("Filter switch"); // Skip filter switch
@@ -589,7 +581,7 @@ namespace lsp
             lsp_trace("Binding meters");
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c    = &vChannels[i];
+                channel_t * const c = &vChannels[i];
 
                 BIND_PORT(c->pFftInSw);
                 BIND_PORT(c->pFftOutSw);
@@ -605,13 +597,13 @@ namespace lsp
             {
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX-1; ++j)
                 {
-                    split_t *s      = &vChannels[i].vSplit[j];
+                    split_t * const s   = &vChannels[i].vSplit[j];
 
                     if ((i > 0) && (nMode == MBEM_STEREO))
                     {
-                        split_t *sc     = &vChannels[0].vSplit[j];
-                        s->pEnabled     = sc->pEnabled;
-                        s->pFreq        = sc->pFreq;
+                        split_t * const sc  = &vChannels[0].vSplit[j];
+                        s->pEnabled         = sc->pEnabled;
+                        s->pFreq            = sc->pFreq;
                     }
                     else
                     {
@@ -627,11 +619,11 @@ namespace lsp
             {
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b   = &vChannels[i].vBands[j];
+                    exp_band_t * const b    = &vChannels[i].vBands[j];
 
                     if ((i > 0) && (nMode == MBEM_STEREO))
                     {
-                        exp_band_t *sb  = &vChannels[0].vBands[j];
+                        exp_band_t * const sb   = &vChannels[0].vBands[j];
 
                         b->pScType      = sb->pScType;
                         b->pScSource    = sb->pScSource;
@@ -709,11 +701,11 @@ namespace lsp
             {
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b   = &vChannels[i].vBands[j];
+                    exp_band_t * const b    = &vChannels[i].vBands[j];
 
-                    b->pEnvLvl      = trace_port(ports[port_id++]);
-                    b->pCurveLvl    = trace_port(ports[port_id++]);
-                    b->pMeterGain   = trace_port(ports[port_id++]);
+                    b->pEnvLvl              = trace_port(ports[port_id++]);
+                    b->pCurveLvl            = trace_port(ports[port_id++]);
+                    b->pMeterGain           = trace_port(ports[port_id++]);
                 }
             }
 
@@ -796,7 +788,7 @@ namespace lsp
             // Configure channels
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c    = &vChannels[i];
+                channel_t * const c = &vChannels[i];
 
                 // Update bypass settings
                 c->sBypass.set_bypass(pBypass->value());
@@ -804,7 +796,7 @@ namespace lsp
                 // Update frequency split bands
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX-1; ++j)
                 {
-                    split_t *s      = &c->vSplit[j];
+                    split_t * const s   = &c->vSplit[j];
 
                     bool enabled    = s->bEnabled;
                     s->bEnabled     = s->pEnabled->value() >= 0.5f;
@@ -881,7 +873,7 @@ namespace lsp
             // Configure channels
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c    = &vChannels[i];
+                channel_t * const c = &vChannels[i];
 
                 // Update expander bands
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
@@ -1000,7 +992,7 @@ namespace lsp
                 // Check muting option
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b      = &c->vBands[j];
+                    exp_band_t * const b    = &c->vBands[j];
                     if ((!b->bMute) && (solo_on))
                         b->bMute    = !b->bSolo;
                 }
@@ -1105,7 +1097,7 @@ namespace lsp
 
                             fp.fGain        = 1.0f;
                             fp.nSlope       = 2;
-                            fp.fQuality     = 0.0;
+                            fp.fQuality     = 0.0f;
 
                             lsp_trace("Filter type=%d, from=%f, to=%f", int(fp.nType), fp.fFreq, fp.fFreq2);
 
@@ -1113,29 +1105,8 @@ namespace lsp
                         }
                         else if (enXOver == XOVER_CLASSIC)
                         {
-                            fp.fGain        = 1.0f;
-                            fp.nSlope       = 2;
-                            fp.fQuality     = 0.0;
-                            fp.fFreq        = b->fFreqEnd;
-                            fp.fFreq2       = b->fFreqEnd;
-
-                            // We're going from low frequencies to high frequencies
-                            if (j >= (c->nPlanSize - 1))
-                            {
-                                fp.nType    = dspu::FLT_NONE;
-                                b->sPassFilter.update(fSampleRate, &fp);
-                                b->sRejFilter.update(fSampleRate, &fp);
-                                b->sAllFilter.update(fSampleRate, &fp);
-                            }
-                            else
-                            {
-                                fp.nType    = dspu::FLT_BT_LRX_LOPASS;
-                                b->sPassFilter.update(fSampleRate, &fp);
-                                fp.nType    = dspu::FLT_BT_LRX_HIPASS;
-                                b->sRejFilter.update(fSampleRate, &fp);
-                                fp.nType    = (j == 0) ? dspu::FLT_NONE : dspu::FLT_BT_LRX_ALLPASS;
-                                b->sAllFilter.update(fSampleRate, &fp);
-                            }
+                            if (band > 0)
+                                c->sXOver.set_frequency(band - 1, b->fFreqStart);
                         }
                         else // enXOver == XOVER_LINEAR_PHASE
                         {
@@ -1151,31 +1122,25 @@ namespace lsp
                     exp_band_t * const b    = &c->vBands[j];
                     sFilters.set_filter_active(b->nFilterID, b->bEnabled);
                     if (j > 0)
-                        c->sLPXOver.set_slope(j-1, (c->vSplit[j-1].bEnabled) ? -48.0f : 0.0f);
+                    {
+                        const bool split_on     = c->vSplit[j-1].bEnabled;
+                        c->sXOver.set_slope(j-1, (split_on) ? dspu::CROSS_SLOPE_48DBO : dspu::CROSS_SLOPE_OFF);
+                        c->sLPXOver.set_slope(j-1, (split_on) ? -48.0f : 0.0f);
+                    }
                 }
 
                 // Set-up all-pass filters for the 'dry' chain which can be mixed with the 'wet' chain.
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX-1; ++j)
                 {
-                    exp_band_t * const b    = (j < (c->nPlanSize-1)) ? c->vPlan[j] : NULL;
-                    fp.nType        = (b != NULL) ? dspu::FLT_BT_LRX_ALLPASS : dspu::FLT_NONE;
-                    fp.fFreq        = (b != NULL) ? b->fFreqEnd : 0.0f;
-                    fp.fFreq2       = fp.fFreq;
-                    fp.fQuality     = 0.0f;
-                    fp.fGain        = 1.0f;
-                    fp.fQuality     = 0.0f;
-                    fp.nSlope       = 2;
-
+                    c->sXOver.get_allpass(j, &fp);
                     c->sDryEq.set_params(j, &fp);
                 }
 
                 // Calculate latency
                 for (size_t j=0; j<c->nPlanSize; ++j)
                 {
-                    exp_band_t *b   = c->vPlan[j];
-
-                    if (latency < b->nLookahead)
-                        latency = b->nLookahead;
+                    exp_band_t * const b    = c->vPlan[j];
+                    latency         = lsp_max(latency, b->nLookahead);
                 }
             }
 
@@ -1185,12 +1150,12 @@ namespace lsp
             set_latency(latency + xover_latency);
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c    = &vChannels[i];
+                channel_t * const c = &vChannels[i];
 
                 // Update latency
                 for (size_t j=0; j<c->nPlanSize; ++j)
                 {
-                    exp_band_t *b   = c->vPlan[j];
+                    exp_band_t * const b    = c->vPlan[j];
                     b->sScDelay.set_delay(latency + xover_latency - b->nLookahead);
                 }
                 c->sDelay.set_delay(latency);
@@ -1239,7 +1204,7 @@ namespace lsp
             // Update channels
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c = &vChannels[i];
+                channel_t * const c = &vChannels[i];
                 c->sBypass.init(sr);
                 c->sDelay.init(max_delay);
                 c->sDryDelay.init(max_delay);
@@ -1256,19 +1221,16 @@ namespace lsp
                     c->sLPXOver.set_phase(float(i) / float(channels));
                 }
                 c->sLPXOver.set_sample_rate(sr);
+                c->sXOver.set_sample_rate(sr);
 
                 // Update bands
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b   = &c->vBands[j];
+                    exp_band_t * const b    = &c->vBands[j];
 
                     b->sSC.set_sample_rate(sr);
                     b->sExp.set_sample_rate(sr);
                     b->sScDelay.init(max_delay);
-
-                    b->sPassFilter.set_sample_rate(sr);
-                    b->sRejFilter.set_sample_rate(sr);
-                    b->sAllFilter.set_sample_rate(sr);
 
                     b->sEQ[0].set_sample_rate(sr);
                     if (channels > 1)
@@ -1304,8 +1266,8 @@ namespace lsp
 
         void mb_expander::process_band(void *object, void *subject, size_t band, const float *data, size_t sample, size_t count)
         {
-            channel_t *c            = static_cast<channel_t *>(subject);
-            exp_band_t *b           = &c->vBands[band];
+            channel_t * const c     = static_cast<channel_t *>(subject);
+            exp_band_t * const b    = &c->vBands[band];
 
             // Store data to band's buffer
             dsp::copy(&b->vBuffer[sample], data, count);
@@ -1672,19 +1634,19 @@ namespace lsp
                     // Apply VCA control
                     for (size_t i=0; i<channels; ++i)
                     {
-                        channel_t *c        = &vChannels[i];
+                        channel_t * const c     = &vChannels[i];
 
                         // Apply delay to compensate lookahead feature
                         c->sDelay.process(c->vInBuffer, c->vInAnalyze, to_process);
 
                         // Process first band
-                        exp_band_t *b       = c->vPlan[0];
+                        exp_band_t *b           = c->vPlan[0];
                         sFilters.process(b->nFilterID, c->vBuffer, c->vInBuffer, b->vVCA, to_process);
 
                         // Process other bands
                         for (size_t j=1; j<c->nPlanSize; ++j)
                         {
-                            exp_band_t *b       = c->vPlan[j];
+                            b                       = c->vPlan[j];
                             sFilters.process(b->nFilterID, c->vBuffer, c->vBuffer, b->vVCA, to_process);
                         }
                     }
@@ -1694,32 +1656,21 @@ namespace lsp
                     // Apply VCA control
                     for (size_t i=0; i<channels; ++i)
                     {
-                        channel_t *c        = &vChannels[i];
+                        channel_t * const c     = &vChannels[i];
 
                         // Originally, there is no signal
                         c->sDelay.process(c->vInBuffer, c->vInAnalyze, to_process); // Apply delay to compensate lookahead feature, store into vBuffer
+                        c->sXOver.process(c->vInBuffer, to_process);
 
                         // First step
-                        exp_band_t *b       = c->vPlan[0];
-                        // Filter frequencies from input
-                        b->sPassFilter.process(vEnv, c->vInBuffer, to_process);
-                        // Apply VCA gain and add to the channel buffer
-                        dsp::mul3(c->vBuffer, vEnv, b->vVCA, to_process);
-                        // Filter frequencies from input
-                        b->sRejFilter.process(vBuffer, c->vInBuffer, to_process);
+                        exp_band_t *b           = c->vPlan[0];
+                        dsp::mul3(c->vBuffer, b->vVCA, b->vBuffer, to_process);
 
                         // All other steps
                         for (size_t j=1; j<c->nPlanSize; ++j)
                         {
-                            b                   = c->vPlan[j];
-                            // Process the signal with all-pass
-                            b->sAllFilter.process(c->vBuffer, c->vBuffer, to_process);
-                            // Filter frequencies from input
-                            b->sPassFilter.process(vEnv, vBuffer, to_process);
-                            // Apply VCA gain and add to the channel buffer
-                            dsp::fmadd3(c->vBuffer, vEnv, b->vVCA, to_process);
-                            // Filter frequencies from input
-                            b->sRejFilter.process(vBuffer, vBuffer, to_process);
+                            b                       = c->vPlan[j];
+                            dsp::fmadd3(c->vBuffer, b->vVCA, b->vBuffer, to_process);
                         }
                     }
                 }
@@ -1728,7 +1679,7 @@ namespace lsp
                     // Apply VCA control
                     for (size_t i=0; i<channels; ++i)
                     {
-                        channel_t *c        = &vChannels[i];
+                        channel_t * const c = &vChannels[i];
 
                         // Apply delay to compensate lookahead feature
                         c->sDelay.process(c->vBuffer, c->vInAnalyze, to_process);
@@ -1756,7 +1707,7 @@ namespace lsp
                 {
                     for (size_t i=0; i<channels; ++i)
                     {
-                        channel_t *c        = &vChannels[i];
+                        channel_t * const c         = &vChannels[i];
                         vAnalyze[c->nAnInChannel]   = c->vInAnalyze;
                         vAnalyze[c->nAnOutChannel]  = c->vBuffer;
                     }
@@ -1806,7 +1757,7 @@ namespace lsp
             // Output FFT curves for each channel
             for (size_t i=0; i<channels; ++i)
             {
-                channel_t *c     = &vChannels[i];
+                channel_t * const c     = &vChannels[i];
 
                 // Calculate transfer function for the expander
                 if (sCounter.fired())
@@ -1831,37 +1782,29 @@ namespace lsp
                         // Calculate transfer function
                         for (size_t j=0; j<c->nPlanSize; ++j)
                         {
-                            exp_band_t *bp      = (j > 0) ? c->vPlan[j-1] : NULL;
-                            exp_band_t *b       = c->vPlan[j];
+                            exp_band_t * const b    = c->vPlan[j];
+                            const size_t band       = b - c->vBands;
 
                             if (b->nSync & S_BAND_CURVE)
                             {
-                                if (bp)
-                                {
-                                    bp->sRejFilter.freq_chart(vRFc, vFreqs, meta::mb_expander_metadata::FFT_MESH_POINTS);
-                                    b->sPassFilter.freq_chart(vPFc, vFreqs, meta::mb_expander_metadata::FFT_MESH_POINTS);
-                                    dsp::pcomplex_mul2(vPFc, vRFc, meta::mb_expander_metadata::FFT_MESH_POINTS);
-                                }
-                                else
-                                    b->sPassFilter.freq_chart(vPFc, vFreqs, meta::mb_expander_metadata::FFT_MESH_POINTS);
-
-                                dsp::pcomplex_mod(b->vTr, vPFc, meta::mb_expander_metadata::FFT_MESH_POINTS);
+                                c->sXOver.freq_chart(band, b->vTr, vFreqs, meta::mb_expander_metadata::FFT_MESH_POINTS);
                                 b->nSync           &= ~size_t(S_BAND_CURVE);
                             }
                             if (j == 0)
-                                dsp::mul_k3(c->vTr, b->vTr, b->fGainLevel, meta::mb_expander_metadata::FFT_MESH_POINTS);
+                                dsp::mul_k3(c->vTr, b->vTr, b->fGainLevel, meta::mb_expander_metadata::FFT_MESH_POINTS*2);
                             else
-                                dsp::fmadd_k3(c->vTr, b->vTr, b->fGainLevel, meta::mb_expander_metadata::FFT_MESH_POINTS);
+                                dsp::fmadd_k3(c->vTr, b->vTr, b->fGainLevel, meta::mb_expander_metadata::FFT_MESH_POINTS*2);
                         }
-                        dsp::copy(c->vTrMem, c->vTr, meta::mb_expander_metadata::FFT_MESH_POINTS);
+                        dsp::pcomplex_mod(c->vTrMem, c->vTr, meta::mb_expander_metadata::FFT_MESH_POINTS);
+
                     }
                     else // enXOver == XOVER_LINEAR_PHASE
                     {
                         // Calculate transfer function
                         for (size_t j=0; j<c->nPlanSize; ++j)
                         {
-                            exp_band_t *b       = c->vPlan[j];
-                            size_t band         = b - c->vBands;
+                            exp_band_t * const b    = c->vPlan[j];
+                            const size_t band       = b - c->vBands;
                             if (b->nSync & S_BAND_CURVE)
                             {
                                 c->sLPXOver.freq_chart(band, b->vTr, vFreqs, meta::mb_expander_metadata::FFT_MESH_POINTS);
@@ -1879,10 +1822,10 @@ namespace lsp
                 // Output FFT curve, compression curve and FFT spectrogram for each band
                 for (size_t j=0; j<meta::mb_expander_metadata::BANDS_MAX; ++j)
                 {
-                    exp_band_t *b       = &c->vBands[j];
+                    exp_band_t * const b    = &c->vBands[j];
 
                     // FFT spectrogram
-                    plug::mesh_t *mesh        = NULL;
+                    plug::mesh_t *mesh      = NULL;
 
                     // FFT curve
                     if (b->nSync & S_EQ_CURVE)
@@ -2129,6 +2072,7 @@ namespace lsp
                     v->write_object("sDryDelay", &c->sDryDelay);
                     v->write_object("sXOverDelay", &c->sXOverDelay);
                     v->write_object("sDryEq", &c->sDryEq);
+                    v->write_object("sXOver", &c->sXOver);
                     v->write_object("sLPXOver", &c->sLPXOver);
 
                     v->begin_array("vBands", c->vBands, meta::mb_expander_metadata::BANDS_MAX);
@@ -2140,9 +2084,6 @@ namespace lsp
                             v->write_object("sSC", &b->sSC);
                             v->write_object_array("sEq", b->sEQ, 2);
                             v->write_object("sExp", &b->sExp);
-                            v->write_object("sPassFilter", &b->sPassFilter);
-                            v->write_object("sRejFilter", &b->sRejFilter);
-                            v->write_object("sAllFilter", &b->sAllFilter);
                             v->write_object("sDelay", &b->sScDelay);
 
                             v->write("vSc", b->vSc);
@@ -2263,8 +2204,6 @@ namespace lsp
             v->write("vBuffer", vBuffer);
             v->write("vEnv", vEnv);
             v->write("vTr", vTr);
-            v->write("vPFc", vPFc);
-            v->write("vRFc", vRFc);
             v->write("vFreqs", vFreqs);
             v->write("vCurve", vCurve);
             v->write("vIndexes", vIndexes);

@@ -111,9 +111,6 @@ namespace lsp
                     dspu::Sidechain     sSC;                // Sidechain module
                     dspu::Equalizer     sEQ[2];             // Sidechain equalizers
                     dspu::Expander      sExp;               // Expander
-                    dspu::Filter        sPassFilter;        // Passing filter for 'classic' mode
-                    dspu::Filter        sRejFilter;         // Rejection filter for 'classic' mode
-                    dspu::Filter        sAllFilter;         // All-pass filter for phase compensation
                     dspu::Delay         sScDelay;           // Delay for lookahead purpose
 
                     float              *vBuffer;            // Crossover band data
@@ -190,6 +187,7 @@ namespace lsp
                     dspu::Delay         sDryDelay;          // Delay for dry signal
                     dspu::Delay         sXOverDelay;        // Delay for crossover
                     dspu::Equalizer     sDryEq;             // Dry equalizer
+                    dspu::Crossover     sXOver;             // Classic crossover
                     dspu::LPCrossover   sLPXOver;           // Linear phase crossover
 
                     exp_band_t          vBands[meta::mb_expander_metadata::BANDS_MAX];      // Expander bands
@@ -251,8 +249,6 @@ namespace lsp
                 float                  *vBuffer;                // Temporary buffer
                 float                  *vEnv;                   // Expander envelope buffer
                 float                  *vTr;                    // Transfer buffer
-                float                  *vPFc;                   // Pass filter characteristics buffer
-                float                  *vRFc;                   // Reject filter characteristics buffer
                 float                  *vFreqs;                 // Analyzer FFT frequencies
                 float                  *vCurve;                 // Curve
                 uint32_t               *vIndexes;               // Analyzer FFT indexes
