@@ -40,6 +40,10 @@ namespace lsp
 {
     namespace meta
     {
+        // Different revisions
+        #define REV_0           0
+        #define REV_1           1
+
         //-------------------------------------------------------------------------
         // Multiband expander
         static const int plugin_classes[]           = { C_EXPANDER, -1 };
@@ -161,6 +165,17 @@ namespace lsp
             { NULL, NULL }
         };
 
+        static const port_item_t mb_exp_cross_slopes[] =
+        {
+            { "6 dB/oct",       "eq.slope.6dbo"         },
+            { "12 dB/oct",      "eq.slope.12dbo"        },
+            { "18 dB/oct",      "eq.slope.18dbo"        },
+            { "24 dB/oct",      "eq.slope.24dbo"        },
+            { "48 dB/oct",      "eq.slope.48dbo"        },
+            { "72 dB/oct",      "eq.slope.72dbo"        },
+            { NULL, NULL }
+        };
+
         #define MB_EXP_SHM_LINK_MONO \
             OPT_RETURN_MONO("link", "shml", "Side-chain shared memory link")
 
@@ -182,6 +197,7 @@ namespace lsp
         #define MB_COMMON(bands) \
             BYPASS, \
             COMBO("mode", "Expander mode", "Mode", 1, mb_global_mb_exp_modes), \
+            ADDON_COMBO(REV_1, "slope", "Crossover slope", "Slope", meta::mb_expander_metadata::SLOPE_DEFAULT, mb_exp_cross_slopes ), \
             AMP_GAIN("g_in", "Input gain", "Input gain", mb_expander_metadata::IN_GAIN_DFL, 10.0f), \
             AMP_GAIN("g_out", "Output gain", "Output gain", mb_expander_metadata::OUT_GAIN_DFL, 10.0f), \
             AMP_GAIN("g_dry", "Dry gain", "Dry", 0.0f, 10.0f), \

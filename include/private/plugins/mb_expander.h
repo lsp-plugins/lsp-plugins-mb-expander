@@ -80,6 +80,18 @@ namespace lsp
                     SCT_LINK,
                 };
 
+                enum modern_filter_t
+                {
+                    FTYPE_NONE,
+                    FTYPE_LOSHELF,
+                    FTYPE_LADDER,
+                    FTYPE_HISHELF,
+                    FTYPE_AMPLIFIER,
+                    FTYPE_LOPASS,
+                    FTYPE_HIPASS
+                };
+
+            protected:
                 typedef struct premix_t
                 {
                     float                   fInToSc;            // Input -> Sidechain mix
@@ -231,19 +243,19 @@ namespace lsp
                 dspu::Analyzer          sAnalyzer;              // Analyzer
                 dspu::DynamicFilters    sFilters;               // Dynamic filters for each band in 'modern' mode
                 dspu::Counter           sCounter;               // Sync counter
+                channel_t              *vChannels;              // Expander channels
                 uint32_t                nMode;                  // Expander channel mode
+                uint32_t                nSlope;                 // Current crossover slope
+                xover_mode_t            enXOver;                // Crossover mode
+                uint32_t                nEnvBoost;              // Envelope boost
                 bool                    bSidechain;             // External side chain
                 bool                    bEnvUpdate;             // Envelope filter update
                 bool                    bUseShmLink;            // Shared memory link is in use
-                xover_mode_t            enXOver;                // Crossover mode
                 bool                    bStereoSplit;           // Stereo split mode
-                uint32_t                nEnvBoost;              // Envelope boost
-                channel_t              *vChannels;              // Expander channels
                 float                   fInGain;                // Input gain
                 float                   fDryGain;               // Dry gain
                 float                   fWetGain;               // Wet gain
                 float                   fZoom;                  // Zoom
-                uint8_t                *pData;                  // Aligned data pointer
                 float                  *vSc[2];                 // Sidechain signal data
                 float                  *vAnalyze[4];            // Analysis buffer
                 float                  *vBuffer;                // Temporary buffer
@@ -258,6 +270,7 @@ namespace lsp
 
                 plug::IPort            *pBypass;                // Bypass port
                 plug::IPort            *pMode;                  // Global operating mode
+                plug::IPort            *pSlope;                 // Crossover slope
                 plug::IPort            *pInGain;                // Input gain port
                 plug::IPort            *pOutGain;               // Output gain port
                 plug::IPort            *pDryGain;               // Dry gain port
@@ -269,12 +282,18 @@ namespace lsp
                 plug::IPort            *pEnvBoost;              // Envelope adjust
                 plug::IPort            *pStereoSplit;           // Split left/right independently
 
+                uint8_t                *pData;                  // Aligned data pointer
+
             protected:
                 static bool compare_bands_for_sort(const exp_band_t *b1, const exp_band_t *b2);
 
                 static dspu::sidechain_source_t     decode_sidechain_source(int source, bool split, size_t channel);
                 static size_t                       select_fft_rank(size_t sample_rate);
                 static void                         process_band(void *object, void *subject, size_t band, const float *data, size_t sample, size_t count);
+                static dspu::crossover_slope_t      classic_xover_slope(size_t slope);
+                static float                        lp_xover_slope(size_t slope);
+                static void                         modern_xover_params(dspu::filter_params_t *fp, modern_filter_t type, size_t slope);
+                static void                         sidechain_filter_params(dspu::filter_params_t *fp, modern_filter_t type, size_t slope);
 
             protected:
                 void                do_destroy();
